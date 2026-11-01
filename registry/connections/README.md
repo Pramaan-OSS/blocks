@@ -1,6 +1,6 @@
 # Connections manager (`connections`)
 
-Every connected account in one list: connect, check, reconnect, disconnect. Licence: AGPL-3.0.
+Every connected account in one list: connect, check, reconnect, disconnect. Licence: MIT.
 
 Your people connect their own apps (Gmail, Outlook, a calendar) through a hosted sign-in. This block
 shows each app's status, starts the sign-in, and handles the return.

@@ -7,7 +7,7 @@
       "name": "approvals",
       "type": "registry:block",
       "title": "Approval inbox",
-      "description": "Everything waiting for a person's yes: pending list, detail with exact inputs and maximum price, Approve and Decline, history, read-only view and a nav badge. Licence: AGPL-3.0.",
+      "description": "Everything waiting for a person's yes: pending list, detail with exact inputs and maximum price, Approve and Decline, history, read-only view and a nav badge. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "badge", "tabs", "alert-dialog", "card", "utils"],
       "files": [
@@ -41,7 +41,7 @@
       "name": "mission-runner",
       "type": "registry:block",
       "title": "Mission runner",
-      "description": "Start a mission from a form built from its input schema, see the estimate first, watch its steps live, cancel, and read the result and cost. A run survives a page reload. Licence: AGPL-3.0.",
+      "description": "Start a mission from a form built from its input schema, see the estimate first, watch its steps live, cancel, and read the result and cost. A run survives a page reload. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "input", "label", "textarea", "utils"],
       "files": [
@@ -78,7 +78,7 @@
       "name": "assessment",
       "type": "registry:block",
       "title": "Assessment",
-      "description": "The builder-side screens for proctored tests: exam list, question builder with preview, publish, invite candidates by link or email, a candidate tracker, results and integrity reports. Candidates take the test on a hosted page their link opens. Licence: AGPL-3.0.",
+      "description": "The builder-side screens for proctored tests: exam list, question builder with preview, publish, invite candidates by link or email, a candidate tracker, results and integrity reports. Candidates take the test on a hosted page their link opens. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "badge", "tabs", "alert-dialog", "input", "label", "textarea", "table", "utils"],
       "files": [
@@ -121,7 +121,7 @@
       "name": "wallet",
       "type": "registry:block",
       "title": "Wallet and usage",
-      "description": "Balance with a low-balance warning and a top-up button, spend over time and by superpower, and the latest activity with its cost. Money shows as dollars to two decimals. Licence: AGPL-3.0.",
+      "description": "Balance with a low-balance warning and a top-up button, spend over time and by superpower, and the latest activity with its cost. Money shows as dollars to two decimals. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "badge", "table", "utils"],
       "files": [
@@ -152,7 +152,7 @@
       "name": "connections",
       "type": "registry:block",
       "title": "Connections manager",
-      "description": "Every connected account in one list: connect an app through the hosted sign-in, land back on a return page that re-checks the status, reconnect, check, disconnect and remove. Also lists your workspace accounts. Licence: AGPL-3.0.",
+      "description": "Every connected account in one list: connect an app through the hosted sign-in, land back on a return page that re-checks the status, reconnect, check, disconnect and remove. Also lists your workspace accounts. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "badge", "table", "utils"],
       "files": [
@@ -188,7 +188,7 @@
       "name": "memory",
       "type": "registry:block",
       "title": "Memory viewer",
-      "description": "What the assistant remembers: search your own memories, delete one, forget everything, see what changed, and (for admins) review organisation memories. Deleting waits for approval in the approvals inbox. Licence: AGPL-3.0.",
+      "description": "What the assistant remembers: search your own memories, delete one, forget everything, see what changed, and (for admins) review organisation memories. Deleting waits for approval in the approvals inbox. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "tabs", "alert-dialog", "input", "label", "badge", "utils"],
       "files": [
@@ -222,7 +222,7 @@
       "name": "superpower-picker",
       "type": "registry:block",
       "title": "Superpower picker",
-      "description": "Find an action or a mission in plain words, answer one clarifying question when the words fit several, see the price, and run an action from a form built from its inputs. Actions that send something wait for a yes in the approvals inbox. Licence: AGPL-3.0.",
+      "description": "Find an action or a mission in plain words, answer one clarifying question when the words fit several, see the price, and run an action from a form built from its inputs. Actions that send something wait for a yes in the approvals inbox. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "input", "label", "textarea", "badge", "utils"],
       "files": [
@@ -256,7 +256,7 @@
       "name": "consent",
       "type": "registry:block",
       "title": "Consent and opt-out",
-      "description": "Honour STOP and consent: an opt-out list with search, check a contact, add an opt-out, let someone be messaged again (approvers only, recorded), a contact status badge, and a public unsubscribe page. Licence: AGPL-3.0.",
+      "description": "Honour STOP and consent: an opt-out list with search, check a contact, add an opt-out, let someone be messaged again (approvers only, recorded), a contact status badge, and a public unsubscribe page. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "input", "label", "alert-dialog", "badge", "utils"],
       "files": [
@@ -289,7 +289,7 @@
       "name": "activity",
       "type": "registry:block",
       "title": "Activity log",
-      "description": "What ran, what it cost, and what failed with the next step: a call list filtered by what ran, how it went and dates, a call detail, and a webhook deliveries tab where the API has the history. Falls back to daily totals until the API lists each call. Licence: AGPL-3.0.",
+      "description": "What ran, what it cost, and what failed with the next step: a call list filtered by what ran, how it went and dates, a call detail, and a webhook deliveries tab where the API has the history. Falls back to daily totals until the API lists each call. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "input", "label", "table", "tabs", "alert-dialog", "badge", "utils"],
       "files": [
@@ -320,7 +320,7 @@
       "name": "checkout",
       "type": "registry:block",
       "title": "Checkout",
-      "description": "Take a payment: a button that sends the customer to the hosted payment page for one plan (prices are read on the server), and a status card that says whether it was paid. Licence: AGPL-3.0.",
+      "description": "Take a payment: a button that sends the customer to the hosted payment page for one plan (prices are read on the server), and a status card that says whether it was paid. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "badge", "utils"],
       "files": [
@@ -351,7 +351,7 @@
       "name": "payouts",
       "type": "registry:block",
       "title": "Seller payments and payouts",
-      "description": "Let a seller set up their own payment account: a status card with what is still needed, and the provider's embedded setup screen. Licence: AGPL-3.0.",
+      "description": "Let a seller set up their own payment account: a status card with what is still needed, and the provider's embedded setup screen. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1", "@stripe/connect-js@3.5.0", "@stripe/react-connect-js@3.5.0"],
       "registryDependencies": ["button", "alert-dialog", "badge", "utils"],
       "files": [
@@ -382,7 +382,7 @@
       "name": "identity-check",
       "type": "registry:block",
       "title": "Identity check",
-      "description": "Verify a person's identity: start a check, show the provider's own screen in the page, then a plain status card with each check's result. Licence: AGPL-3.0.",
+      "description": "Verify a person's identity: start a check, show the provider's own screen in the page, then a plain status card with each check's result. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "badge", "utils"],
       "files": [
@@ -411,7 +411,7 @@
       "name": "chat",
       "type": "registry:block",
       "title": "Chat",
-      "description": "A chat with an assistant: replies stream in, the assistant can do things for the person, and anything that needs a yes waits in the approvals inbox before the chat carries on. Licence: AGPL-3.0.",
+      "description": "A chat with an assistant: replies stream in, the assistant can do things for the person, and anything that needs a yes waits in the approvals inbox before the chat carries on. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1", "lucide-react@1.65.0"],
       "registryDependencies": ["button", "textarea", "label", "alert-dialog", "utils"],
       "files": [
@@ -443,7 +443,7 @@
       "name": "account",
       "type": "registry:block",
       "title": "Account",
-      "description": "Who is signed in, the organisation's name (owners and admins can change it) and the team with roles and spending limits. Licence: AGPL-3.0.",
+      "description": "Who is signed in, the organisation's name (owners and admins can change it) and the team with roles and spending limits. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "input", "label", "alert-dialog", "utils"],
       "files": [
@@ -473,7 +473,7 @@
       "name": "subscriptions",
       "type": "registry:block",
       "title": "Subscriptions",
-      "description": "A customer's plan (price, status, renewal date) and a button to the hosted billing page to change their card or cancel. The customer comes from your sign-in, never the browser. Licence: AGPL-3.0.",
+      "description": "A customer's plan (price, status, renewal date) and a button to the hosted billing page to change their card or cancel. The customer comes from your sign-in, never the browser. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "utils"],
       "files": [
@@ -504,7 +504,7 @@
       "name": "voice-call",
       "type": "registry:block",
       "title": "Voice call",
-      "description": "A dialler card for the browser: keypad, number display, calling-from line, in-call timer with mute and hang up, and recent calls with one-click call back. A call waits for a yes in the approvals inbox. Licence: AGPL-3.0.",
+      "description": "A dialler card for the browser: keypad, number display, calling-from line, in-call timer with mute and hang up, and recent calls with one-click call back. A call waits for a yes in the approvals inbox. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1", "lucide-react@1.65.0"],
       "registryDependencies": ["button", "alert-dialog", "input", "label", "badge", "utils"],
       "files": [
@@ -535,7 +535,7 @@
       "name": "booking",
       "type": "registry:block",
       "title": "Booking",
-      "description": "Visitors pick an open time on your own connected calendar and book it. Shows needs connection with a link to connections when the calendar isn't linked. Licence: AGPL-3.0.",
+      "description": "Visitors pick an open time on your own connected calendar and book it. Shows needs connection with a link to connections when the calendar isn't linked. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "input", "label", "utils"],
       "files": [
@@ -566,7 +566,7 @@
       "name": "e-sign",
       "type": "registry:block",
       "title": "E-signature",
-      "description": "Send a document to be signed by email, see who has signed, remind the ones who haven't, and open the signed copy. Licence: AGPL-3.0.",
+      "description": "Send a document to be signed by email, see who has signed, remind the ones who haven't, and open the signed copy. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "input", "label", "alert-dialog", "badge", "utils"],
       "files": [
@@ -598,7 +598,7 @@
       "name": "upload",
       "type": "registry:block",
       "title": "File upload",
-      "description": "Drag and drop files, watch each one upload with progress straight to storage, then see, open and delete what you uploaded. Licence: AGPL-3.0.",
+      "description": "Drag and drop files, watch each one upload with progress straight to storage, then see, open and delete what you uploaded. Licence: MIT.",
       "dependencies": ["@pramaan/sdk@0.1.4", "server-only@0.0.1"],
       "registryDependencies": ["button", "alert-dialog", "badge", "utils"],
       "files": [
@@ -629,10 +629,252 @@
       "name": "theme",
       "type": "registry:file",
       "title": "Pramaan blocks theme",
-      "description": "The Pramaan look: one CSS file of colour, type, radius and dark-mode variables that every block reads, and the three fonts it uses. Import the CSS after Tailwind and put pramaanFonts on <html>. Licence: AGPL-3.0.",
+      "description": "The Pramaan look: one CSS file of colour, type, radius and dark-mode variables that every block reads, and the three fonts it uses. Import the CSS after Tailwind and put pramaanFonts on <html>. Licence: MIT.",
       "files": [
         { "path": "theme.css", "type": "registry:file", "target": "app/pramaan-theme.css" },
         { "path": "registry/theme/lib/pramaan/fonts.ts", "type": "registry:lib", "target": "lib/pramaan/fonts.ts" }
+      ]
+    },
+    {
+      "name": "password-reset",
+      "type": "registry:block",
+      "title": "Password reset",
+      "description": "Request an emailed reset link, choose a new password, and change it while signed in. Licence: MIT.",
+      "dependencies": [
+        "@pramaan/sdk@0.1.4",
+        "server-only@0.0.1"
+      ],
+      "registryDependencies": [
+        "button",
+        "input",
+        "label",
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/pramaan-core/lib/pramaan/server.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/server.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/session.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/session.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-platform.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-platform.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-assessment.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-assessment.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-memory.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-memory.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-consent.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-consent.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-activity.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-activity.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-catalogue.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-catalogue.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-wave3.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-wave3.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/client.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/client.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/plain.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/plain.ts"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/states.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/states.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/parts.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/parts.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/confirm-action.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/confirm-action.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/fields.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/fields.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/public-guard.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/public-guard.ts"
+        },
+        {
+          "path": "registry/password-reset/app/api/pramaan/password-reset/route.ts",
+          "type": "registry:file",
+          "target": "app/api/pramaan/password-reset/route.ts"
+        },
+        {
+          "path": "registry/password-reset/components/pramaan/password-reset/password-panel.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/password-reset/password-panel.tsx"
+        },
+        {
+          "path": "registry/password-reset/lib/pramaan/password-reset-runtime.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/password-reset-runtime.ts"
+        },
+        {
+          "path": "registry/password-reset/lib/pramaan/password-reset-sender.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/password-reset-sender.ts"
+        },
+        {
+          "path": "registry/password-reset/lib/pramaan/password-reset-store.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/password-reset-store.ts"
+        },
+        {
+          "path": "registry/password-reset/lib/pramaan/password-reset.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/password-reset.ts"
+        },
+        {
+          "path": "registry/password-reset/migrations/001-password-reset.sql",
+          "type": "registry:file",
+          "target": "migrations/001-password-reset.sql"
+        }
+      ]
+    },
+    {
+      "name": "contacts",
+      "type": "registry:block",
+      "title": "Contacts",
+      "description": "People and companies with notes and history in your own database. Licence: MIT.",
+      "dependencies": [
+        "postgres@3.4.7",
+        "server-only@0.0.1"
+      ],
+      "files": [
+        {
+          "path": "registry/contacts/app/api/pramaan/contacts/route.ts",
+          "type": "registry:file",
+          "target": "app/api/pramaan/contacts/route.ts"
+        },
+        {
+          "path": "registry/contacts/components/pramaan/contacts/contacts-panel.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/contacts/contacts-panel.tsx"
+        },
+        {
+          "path": "registry/contacts/lib/pramaan/contacts.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/contacts.ts"
+        },
+        {
+          "path": "registry/contacts/src/db/migrations/crm_contacts_001.sql",
+          "type": "registry:file",
+          "target": "src/db/migrations/crm_contacts_001.sql"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/client.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/client.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/plain.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/plain.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/session.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/session.ts"
+        },
+        {
+          "path": "registry/crm-data/lib/pramaan/crm-data.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/crm-data.ts"
+        }
+      ]
+    },
+    {
+      "name": "pipeline",
+      "type": "registry:block",
+      "title": "Pipeline",
+      "description": "Deals and tasks with stage totals and accessible stage moves in your own database. Licence: MIT.",
+      "dependencies": [
+        "postgres@3.4.7",
+        "server-only@0.0.1"
+      ],
+      "files": [
+        {
+          "path": "registry/pipeline/app/api/pramaan/pipeline/route.ts",
+          "type": "registry:file",
+          "target": "app/api/pramaan/pipeline/route.ts"
+        },
+        {
+          "path": "registry/pipeline/components/pramaan/pipeline/pipeline-panel.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/pipeline/pipeline-panel.tsx"
+        },
+        {
+          "path": "registry/pipeline/lib/pramaan/pipeline.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/pipeline.ts"
+        },
+        {
+          "path": "registry/pipeline/src/db/migrations/crm_pipeline_001.sql",
+          "type": "registry:file",
+          "target": "src/db/migrations/crm_pipeline_001.sql"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/client.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/client.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/plain.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/plain.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/session.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/session.ts"
+        },
+        {
+          "path": "registry/crm-data/lib/pramaan/crm-data.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/crm-data.ts"
+        }
       ]
     }
   ]

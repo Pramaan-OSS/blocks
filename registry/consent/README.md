@@ -1,6 +1,6 @@
 # Consent and opt-out (`consent`)
 
-Honour STOP and consent in your app. Licence: AGPL-3.0.
+Honour STOP and consent in your app. Licence: MIT.
 
 ## Install
 

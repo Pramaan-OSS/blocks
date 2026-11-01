@@ -1,6 +1,6 @@
 # Seller payments and payouts (`payouts`)
 
-Let a seller set up their own payment account and see where it stands. Licence: AGPL-3.0.
+Let a seller set up their own payment account and see where it stands. Licence: MIT.
 
 ## Install
 

@@ -1,7 +1,7 @@
 # E-signature (`e-sign`)
 
 Send a document to be signed by email, see who has signed, remind the ones who haven't, and open
-the signed copy. Licence: AGPL-3.0.
+the signed copy. Licence: MIT.
 
 ## Install
 

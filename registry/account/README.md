@@ -1,7 +1,7 @@
 # Account (`account`)
 
 Show a signed-in person who they are, their organisation's name and, to owners and admins, the team.
-Licence: AGPL-3.0.
+Licence: MIT.
 
 ## Install
 

@@ -1,7 +1,7 @@
 # Subscriptions (`subscriptions`)
 
 Show a customer their plan and send them to the hosted billing page to change their card, see
-invoices or cancel. Licence: AGPL-3.0.
+invoices or cancel. Licence: MIT.
 
 ## Install
 

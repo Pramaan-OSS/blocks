@@ -1,6 +1,6 @@
 # Booking (`booking`)
 
-Visitors pick an open time on your connected calendar and book it. Licence: AGPL-3.0.
+Visitors pick an open time on your connected calendar and book it. Licence: MIT.
 
 ## Install
 

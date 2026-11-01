@@ -61,7 +61,7 @@ export function emailLimitKey(email: string): string {
 }
 
 /** Optional server-side verification. No network call at all when disabled. */
-export async function verifyBookingBot(request: Request, token: unknown) {
+export async function verifyPublicBot(request: Request, token: unknown) {
   const secret = process.env.PRAMAAN_BOT_CHECK_SECRET;
   if (!secret) return;
   const refusal = () => new PramaanError("invalid_request", "Please complete the security check and try again.", { status: 400 });
@@ -73,3 +73,6 @@ export async function verifyBookingBot(request: Request, token: unknown) {
     if (result?.passed !== true) throw refusal();
   } catch { throw refusal(); }
 }
+
+/** Kept for existing booking installs. */
+export const verifyBookingBot = verifyPublicBot;

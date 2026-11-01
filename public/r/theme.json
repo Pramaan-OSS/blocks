@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "theme",
   "title": "Pramaan blocks theme",
-  "description": "The Pramaan look: one CSS file of colour, type, radius and dark-mode variables that every block reads, and the three fonts it uses. Import the CSS after Tailwind and put pramaanFonts on <html>. Licence: AGPL-3.0.",
+  "description": "The Pramaan look: one CSS file of colour, type, radius and dark-mode variables that every block reads, and the three fonts it uses. Import the CSS after Tailwind and put pramaanFonts on <html>. Licence: MIT.",
   "files": [
     {
       "path": "theme.css",

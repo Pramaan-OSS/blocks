@@ -1,6 +1,6 @@
 # Wallet and usage (`wallet`)
 
-Balance, top-up and spend, inside your own app. Licence: AGPL-3.0.
+Balance, top-up and spend, inside your own app. Licence: MIT.
 
 ## Install
 

@@ -22,6 +22,11 @@
       }
     ],
     "paths": {
+      "@/lib/pramaan/contacts": ["./registry/contacts/lib/pramaan/contacts.ts"],
+      "@/components/pramaan/contacts/*": ["./registry/contacts/components/pramaan/contacts/*"],
+      "@/lib/pramaan/pipeline": ["./registry/pipeline/lib/pramaan/pipeline.ts"],
+      "@/components/pramaan/pipeline/*": ["./registry/pipeline/components/pramaan/pipeline/*"],
+      "@/lib/pramaan/crm-data": ["./registry/crm-data/lib/pramaan/crm-data.ts"],
       "@/lib/pramaan/memory": [
         "./registry/memory/lib/pramaan/memory.ts"
       ],
@@ -110,6 +115,11 @@
       "@/components/pramaan/*": [
         "./registry/pramaan-core/components/pramaan/*"
       ],
+      "@/lib/pramaan/password-reset": ["./registry/password-reset/lib/pramaan/password-reset.ts"],
+      "@/lib/pramaan/password-reset-store": ["./registry/password-reset/lib/pramaan/password-reset-store.ts"],
+      "@/lib/pramaan/password-reset-sender": ["./registry/password-reset/lib/pramaan/password-reset-sender.ts"],
+      "@/lib/pramaan/password-reset-runtime": ["./registry/password-reset/lib/pramaan/password-reset-runtime.ts"],
+      "@/components/pramaan/password-reset/*": ["./registry/password-reset/components/pramaan/password-reset/*"],
       "@/*": [
         "./*"
       ]

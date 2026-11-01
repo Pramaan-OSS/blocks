@@ -1,6 +1,6 @@
 # Identity check (`identity-check`)
 
-Check a person's identity with an ID document and a selfie. Licence: AGPL-3.0.
+Check a person's identity with an ID document and a selfie. Licence: MIT.
 
 ## Install
 

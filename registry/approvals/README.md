@@ -1,7 +1,7 @@
 # Approval inbox (`approvals`)
 
 One place where a person sees every call waiting for their yes, and approves or declines it.
-Licence: AGPL-3.0.
+Licence: MIT.
 
 ## Install
 

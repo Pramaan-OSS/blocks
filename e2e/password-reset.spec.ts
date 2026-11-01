@@ -1,0 +1,51 @@
+import { chromium, expect, test } from "@playwright/test";
+import { mkdir } from "node:fs/promises";
+import { BASE } from "./base";
+
+test("passwords: emailed reset, used link, sign in and authenticated password change", async () => {
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const context = await browser.newContext({ baseURL: BASE });
+    const page = await context.newPage();
+    const headers = { origin: BASE };
+    await page.request.post("/api/demo/password-reset", { headers, data: { action: "reset" } });
+    await page.goto("/password-reset");
+    const request = page.getByRole("region", { name: "Forgot your password?" });
+    await request.getByLabel("Email", { exact: true }).fill("sam@example.com");
+    await request.getByRole("button", { name: "Send reset link" }).click();
+    await expect(request.getByRole("status")).toHaveText("If that email has an account, a password reset link will arrive shortly.");
+    await page.getByRole("button", { name: "Check sample mail" }).click();
+    const link = page.getByRole("link", { name: "Open reset email 1" });
+    await expect(link).toBeVisible();
+    const address = (await link.getAttribute("href"))!;
+    await link.click();
+    const reset = page.getByRole("region", { name: "Choose a new password", exact: true });
+    await expect(reset).toBeVisible();
+    await expect(page).toHaveURL(`${BASE}/password-reset`);
+    await reset.getByLabel("New password", { exact: true }).fill("A different password 73");
+    await reset.getByLabel("Confirm new password", { exact: true }).fill("These do not match 77");
+    await reset.getByRole("button", { name: "Save password" }).click();
+    await expect(reset.getByRole("alert")).toHaveText("The new passwords do not match.");
+    await reset.getByLabel("Confirm new password", { exact: true }).fill("A different password 73");
+    await reset.getByRole("button", { name: "Save password" }).click();
+    await expect(reset.getByRole("status")).toHaveText("Your password has been changed. Sign in with your new password.");
+    const proof = new URLSearchParams(new URL(address).hash.slice(1)).get("token");
+    const reused = await page.request.post("/api/pramaan/password-reset", { headers, data: { action: "reset", token: proof, password: "Another password 99" } });
+    expect(reused.status()).toBe(400);
+    expect((await page.request.post("/api/demo/password-reset", { headers, data: { action: "signin", password: "Starting password 42" } })).status()).toBe(401);
+    expect((await page.request.post("/api/demo/password-reset", { headers, data: { action: "signin", password: "A different password 73" } })).status()).toBe(200);
+    await page.goto("/password-reset");
+    const change = page.getByRole("region", { name: "Change your password", exact: true });
+    await change.getByLabel("Current password").fill("A different password 73");
+    await change.getByLabel("New password", { exact: true }).fill("Final changed password 81");
+    await change.getByLabel("Confirm new password", { exact: true }).fill("Final changed password 81");
+    await change.getByRole("button", { name: "Save password" }).click();
+    await expect(change.getByRole("status")).toHaveText("Your password has been changed. Sign in with your new password.");
+    const ended = await page.request.post("/api/pramaan/password-reset", { headers, data: { action: "change", currentPassword: "Final changed password 81", password: "Should not be saved 44" } });
+    expect(ended.status()).toBe(401);
+    expect((await page.request.post("/api/demo/password-reset", { headers, data: { action: "signin", password: "Final changed password 81" } })).status()).toBe(200);
+    await expect(page.locator("main")).not.toContainText(/sample-person|token_hash|PRAMAAN_|Idempotency|scrypt/);
+    await mkdir(".scratch", { recursive: true });
+    await page.screenshot({ path: ".scratch/password-reset.png", fullPage: true });
+  } finally { await browser.close(); }
+});

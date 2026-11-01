@@ -1,6 +1,6 @@
 # Mission runner (`mission-runner`)
 
-Start a mission, watch its steps, see the result and what it cost. Licence: AGPL-3.0.
+Start a mission, watch its steps, see the result and what it cost. Licence: MIT.
 A mission is a fixed sequence of steps under one business name (Pramaan calls it an outcome).
 
 ## Install

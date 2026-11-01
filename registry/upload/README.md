@@ -2,7 +2,7 @@
 
 Drag and drop files, watch each one upload with its own progress bar, then see, open and delete what
 you uploaded. Each file goes straight from the browser to storage, so large files never pass
-through your app. Licence: AGPL-3.0.
+through your app. Licence: MIT.
 
 ## Install
 

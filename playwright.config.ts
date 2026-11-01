@@ -9,7 +9,7 @@ export default defineConfig({
   workers: 1,
   use: { baseURL: `http://localhost:${port}`, headless: true },
   webServer: {
-    env: { PRAMAAN_FAKE_STEP_MS: "1000", PRAMAAN_BOOKING_HOST: "user-42" },
+    env: { PRAMAAN_PASSWORD_RESET_TEST_MODE: "1", PRAMAAN_PASSWORD_RESET_ORIGIN: `http://localhost:${port}`, PRAMAAN_FAKE_STEP_MS: "1000", PRAMAAN_BOOKING_HOST: "user-42" },
     // Serves the production build: run `pnpm build` first (it needs no dev lock, so it can sit beside a dev server).
     command: `PRAMAAN_FAKE=1 next start -p ${port}`,
     url: `http://localhost:${port}`,

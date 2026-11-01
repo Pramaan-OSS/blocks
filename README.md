@@ -60,6 +60,8 @@ Then open http://localhost:3100. `pnpm dev` runs the demo on the fake Pramaan, s
 | `activity` | What ran, what it cost, what failed and what to do next | [registry/activity/README.md](registry/activity/README.md) |
 | `chat` | A chat with an assistant; replies stream, actions that need a yes wait in the approvals inbox | [registry/chat/README.md](registry/chat/README.md) |
 | `account` | Who is signed in, the organisation name, the team for owners and admins | [registry/account/README.md](registry/account/README.md) |
+| `contacts` | People and companies with search, notes, history and company links in your app's database | [registry/contacts/README.md](registry/contacts/README.md) |
+| `pipeline` | Deals and tasks with stage moves, owners, values and totals in your app's database | [registry/pipeline/README.md](registry/pipeline/README.md) |
 | `subscriptions` | A customer's plan and a button to the hosted billing page | [registry/subscriptions/README.md](registry/subscriptions/README.md) |
 | `voice-call` | A phone in the browser: open, call, hang up, mute, call log | [registry/voice-call/README.md](registry/voice-call/README.md) |
 | `booking` | Visitors book an open time on your own connected calendar | [registry/booking/README.md](registry/booking/README.md) |
@@ -120,4 +122,6 @@ Name a block's component files differently from its server file in `lib/pramaan/
 
 ## Licence
 
-AGPL-3.0 (see `LICENSE`). Every block is AGPL-3.0 too.
+MIT (see `LICENSE`). Every block is MIT too.
+
+Password recovery: see [password-reset](registry/password-reset/README.md) for reset links, signed-in password changes and private email delivery. The demo is at `/password-reset`.

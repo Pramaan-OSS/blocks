@@ -35,3 +35,10 @@ function readCookie(request: Request, name: string): string | undefined {
   }
   return undefined;
 }
+
+/** Authorise writes using trusted membership data. Wire this alongside currentMemberId. */
+export async function canWrite(member: string, scope: string): Promise<boolean> {
+  if (process.env.PRAMAAN_FAKE === "1") return member === "mbr_owner" && scope === member;
+  // Deny until the host app checks this member's write role in the chosen workspace.
+  return false;
+}

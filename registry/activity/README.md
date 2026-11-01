@@ -1,6 +1,6 @@
 # Activity log (`activity`)
 
-What ran, what it cost, and what failed, with the next step. Licence: AGPL-3.0.
+What ran, what it cost, and what failed, with the next step. Licence: MIT.
 
 ## Install
 

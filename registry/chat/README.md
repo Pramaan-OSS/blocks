@@ -2,7 +2,7 @@
 
 A chat with an assistant, inside your app. Replies stream in as they are written. When the
 assistant wants to do something for the person, it runs on the server, and anything that needs a
-yes waits in the approvals inbox (the `approvals` block) before the chat carries on. Licence: AGPL-3.0.
+yes waits in the approvals inbox (the `approvals` block) before the chat carries on. Licence: MIT.
 
 ## Install
 

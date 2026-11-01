@@ -2,7 +2,7 @@
 
 A dialler card for the browser, about 360px wide, with recent calls beside it on wide screens
 (stacked below 768px): number display, keypad, calling-from line, a big Call button, an in-call timer with Mute and Hang up, and recent calls with one-click
-call back. Licence: AGPL-3.0.
+call back. Licence: MIT.
 
 ## Install
 

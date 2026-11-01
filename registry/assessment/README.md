@@ -1,6 +1,6 @@
 # Assessment (`assessment`)
 
-The builder-side screens for proctored tests. Licence: AGPL-3.0.
+The builder-side screens for proctored tests. Licence: MIT.
 
 The hosted test engine owns the exam, the test page, grading, the identity check and the integrity
 report. This block is only what you, the builder, see: exams, questions, invitations, results.

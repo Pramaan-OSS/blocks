@@ -18,6 +18,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <a href="/" className={link}>
               Approvals <ApprovalsBadge />
             </a>
+            <a href="/contacts" className={link}>Contacts</a>
+            <a href="/pipeline" className={link}>Pipeline</a>
             <a href="/missions" className={link}>
               Missions
             </a>
@@ -57,6 +59,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <a href="/account" className={link}>
               Account
             </a>
+            <a href="/password-reset" className={link}>Passwords</a>
             <a href="/subscriptions" className={link}>
               Subscriptions
             </a>

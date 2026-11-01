@@ -1,6 +1,6 @@
 # Checkout (`checkout`)
 
-Take a payment on a hosted payment page. Licence: AGPL-3.0.
+Take a payment on a hosted payment page. Licence: MIT.
 
 ## Install
 

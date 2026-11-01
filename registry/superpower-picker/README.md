@@ -1,6 +1,6 @@
 # Superpower picker (`superpower-picker`)
 
-Find an action or a mission in plain words, see what it costs, and run it. Licence: AGPL-3.0.
+Find an action or a mission in plain words, see what it costs, and run it. Licence: MIT.
 
 ## Install
 

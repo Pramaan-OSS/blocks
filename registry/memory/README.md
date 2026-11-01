@@ -1,6 +1,6 @@
 # Memory viewer (`memory`)
 
-"What the assistant remembers": your own memories and, for admins, your organisation's. Licence: AGPL-3.0.
+"What the assistant remembers": your own memories and, for admins, your organisation's. Licence: MIT.
 
 ## Install
 
