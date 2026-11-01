@@ -56,7 +56,7 @@ export function ConfirmAction({
       </Button>
       <AlertDialog
         open={open}
-        onOpenChange={(next) => {
+        onOpenChange={(next: boolean) => {
           setOpen(next);
           // Back to the button that opened it, for keyboard users.
           if (!next) requestAnimationFrame(() => button.current?.focus());

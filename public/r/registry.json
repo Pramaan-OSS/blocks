@@ -644,12 +644,7 @@
         "@pramaan/sdk@0.1.4",
         "server-only@0.0.1"
       ],
-      "registryDependencies": [
-        "button",
-        "input",
-        "label",
-        "utils"
-      ],
+      "registryDependencies": ["button", "input", "label", "utils", "alert-dialog"],
       "files": [
         {
           "path": "registry/pramaan-core/lib/pramaan/server.ts",
@@ -778,6 +773,7 @@
       "type": "registry:block",
       "title": "Contacts",
       "description": "People and companies with notes and history in your own database. Licence: MIT.",
+      "registryDependencies": ["alert-dialog"],
       "dependencies": [
         "postgres@3.4.7",
         "server-only@0.0.1"
@@ -830,6 +826,7 @@
       "type": "registry:block",
       "title": "Pipeline",
       "description": "Deals and tasks with stage totals and accessible stage moves in your own database. Licence: MIT.",
+      "registryDependencies": ["alert-dialog"],
       "dependencies": [
         "postgres@3.4.7",
         "server-only@0.0.1"

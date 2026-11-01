@@ -7,6 +7,9 @@
     "postgres@3.4.7",
     "server-only@0.0.1"
   ],
+  "registryDependencies": [
+    "alert-dialog"
+  ],
   "files": [
     {
       "path": "registry/pipeline/app/api/pramaan/pipeline/route.ts",

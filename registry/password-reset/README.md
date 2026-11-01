@@ -17,6 +17,8 @@ import { PasswordPanel } from "@/components/pramaan/password-reset/password-pane
 <PasswordPanel />
 ```
 
+Routes use Next.js’s default Node.js runtime, including when Cache Components is enabled.
+
 Put that panel at `/password-reset`, the path used by emailed links. The registry includes the POST
 handler at `/api/pramaan/password-reset`, the server helpers and the database migration. The demo
 page and sample mailbox are repository examples, not installed public routes.
@@ -61,7 +63,6 @@ import { configuredResetSender } from "@/lib/pramaan/password-reset-sender";
 import { pool } from "@/lib/db";
 import { accounts } from "@/lib/accounts-runtime";
 
-export const runtime = "nodejs";
 const passwords = createPasswordReset({
   store: postgresResetStore(pool),
   sender: configuredResetSender(),
