@@ -1,0 +1,12 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.env*
+!.env.example
+test-results/
+playwright-report/
+.DS_Store
+.scratch/
+# Written by `next dev`; the org's own AGENTS.md lives one level up.
+/AGENTS.md

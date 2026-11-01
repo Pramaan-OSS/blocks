@@ -1,0 +1,130 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/lib/pramaan/memory": [
+        "./registry/memory/lib/pramaan/memory.ts"
+      ],
+      "@/components/pramaan/memory/*": [
+        "./registry/memory/components/pramaan/memory/*"
+      ],
+      "@/lib/pramaan/picker": [
+        "./registry/superpower-picker/lib/pramaan/picker.ts"
+      ],
+      "@/components/pramaan/picker/*": [
+        "./registry/superpower-picker/components/pramaan/picker/*"
+      ],
+      "@/lib/pramaan/consent": [
+        "./registry/consent/lib/pramaan/consent.ts"
+      ],
+      "@/components/pramaan/consent/*": [
+        "./registry/consent/components/pramaan/consent/*"
+      ],
+      "@/lib/pramaan/activity": [
+        "./registry/activity/lib/pramaan/activity.ts"
+      ],
+      "@/components/pramaan/activity/*": [
+        "./registry/activity/components/pramaan/activity/*"
+      ],
+      "@/lib/pramaan/checkout": ["./registry/checkout/lib/pramaan/checkout.ts"],
+      "@/lib/pramaan/checkout-plans": ["./registry/checkout/lib/pramaan/checkout-plans.ts"],
+      "@/components/pramaan/checkout/*": ["./registry/checkout/components/pramaan/checkout/*"],
+      "@/lib/pramaan/payouts": ["./registry/payouts/lib/pramaan/payouts.ts"],
+      "@/components/pramaan/payouts/*": ["./registry/payouts/components/pramaan/payouts/*"],
+      "@/lib/pramaan/identity": ["./registry/identity-check/lib/pramaan/identity.ts"],
+      "@/components/pramaan/identity/*": ["./registry/identity-check/components/pramaan/identity/*"],
+      "@/lib/pramaan/voice": ["./registry/voice-call/lib/pramaan/voice.ts"],
+      "@/lib/pramaan/browser-phone": ["./registry/voice-call/lib/pramaan/browser-phone.ts"],
+      "@/lib/pramaan/dialler": ["./registry/voice-call/lib/pramaan/dialler.ts"],
+      "@/components/pramaan/voice/*": ["./registry/voice-call/components/pramaan/voice/*"],
+      "@/lib/pramaan/booking": ["./registry/booking/lib/pramaan/booking.ts"],
+      "@/components/pramaan/booking/*": ["./registry/booking/components/pramaan/booking/*"],
+      "@/lib/pramaan/signing": ["./registry/e-sign/lib/pramaan/signing.ts"],
+      "@/components/pramaan/signing/*": ["./registry/e-sign/components/pramaan/signing/*"],
+      "@/lib/pramaan/upload": ["./registry/upload/lib/pramaan/upload.ts"],
+      "@/components/pramaan/upload/*": ["./registry/upload/components/pramaan/upload/*"],
+      "@/lib/pramaan/chat": ["./registry/chat/lib/pramaan/chat.ts"],
+      "@/components/pramaan/chat/*": ["./registry/chat/components/pramaan/chat/*"],
+      "@/lib/pramaan/account": ["./registry/account/lib/pramaan/account.ts"],
+      "@/components/pramaan/account/*": ["./registry/account/components/pramaan/account/*"],
+      "@/lib/pramaan/subscriptions": ["./registry/subscriptions/lib/pramaan/subscriptions.ts"],
+      "@/components/pramaan/subscriptions/*": ["./registry/subscriptions/components/pramaan/subscriptions/*"],
+      "@/lib/pramaan/chat-tools": ["./registry/chat/lib/pramaan/chat-tools.ts"],
+      "@/lib/pramaan/subscriptions-customer": ["./registry/subscriptions/lib/pramaan/subscriptions-customer.ts"],
+      "@/lib/pramaan/fonts": [
+        "./registry/theme/lib/pramaan/fonts.ts"
+      ],
+      "@/lib/pramaan/assessment": [
+        "./registry/assessment/lib/pramaan/assessment.ts"
+      ],
+      "@/components/pramaan/assessment/*": [
+        "./registry/assessment/components/pramaan/assessment/*"
+      ],
+      "@/lib/pramaan/connections": [
+        "./registry/connections/lib/pramaan/connections.ts"
+      ],
+      "@/components/pramaan/connections/*": [
+        "./registry/connections/components/pramaan/connections/*"
+      ],
+      "@/lib/pramaan/wallet": [
+        "./registry/wallet/lib/pramaan/wallet.ts"
+      ],
+      "@/components/pramaan/wallet/*": [
+        "./registry/wallet/components/pramaan/wallet/*"
+      ],
+      "@/lib/pramaan/missions": [
+        "./registry/mission-runner/lib/pramaan/missions.ts"
+      ],
+      "@/components/pramaan/missions/*": [
+        "./registry/mission-runner/components/pramaan/missions/*"
+      ],
+      "@/lib/pramaan/approvals": [
+        "./registry/approvals/lib/pramaan/approvals.ts"
+      ],
+      "@/lib/pramaan/*": [
+        "./registry/pramaan-core/lib/pramaan/*"
+      ],
+      "@/components/pramaan/approvals/*": [
+        "./registry/approvals/components/pramaan/approvals/*"
+      ],
+      "@/components/pramaan/*": [
+        "./registry/pramaan-core/components/pramaan/*"
+      ],
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowJs": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "public"
+  ]
+}
