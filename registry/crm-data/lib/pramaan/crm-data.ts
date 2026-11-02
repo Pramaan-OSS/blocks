@@ -23,7 +23,7 @@ export async function crmScope(request: Request) {
 
 const memory = new Map<string, unknown>();
 let sql: ReturnType<typeof postgres> | undefined;
-function database() {
+export function crmDatabase() {
   if (!process.env.DATABASE_URL) throw new CrmProblem("Your workspace is not connected yet.", 503);
   return sql ??= postgres(process.env.DATABASE_URL, { max: 5, prepare: false });
 }
@@ -32,6 +32,12 @@ export async function closeCrmDatabase() {
   sql = undefined;
 }
 export function resetCrmFake() { memory.clear(); }
+/** In-memory rows standing in for one table while the fake is on. */
+export function fakeRows<T>(table: string): T[] {
+  let rows = memory.get(`rows:${table}`) as T[] | undefined;
+  if (!rows) memory.set(`rows:${table}`, rows = []);
+  return rows;
+}
 type Block = "contacts" | "pipeline";
 function table(block: Block) {
   if (block !== "contacts" && block !== "pipeline") throw new CrmProblem("Choose a workspace list.");
@@ -48,7 +54,7 @@ function documentJson(value: unknown) {
 export async function readData<T>(block: Block, scope: string, initial: T): Promise<T> {
   const name = table(block);
   if (process.env.PRAMAAN_FAKE === "1") return jsonCopy((memory.get(`${block}:${scope}`) ?? initial) as T);
-  const rows = await database().unsafe(`select data from ${name} where scope = $1`, [scope]);
+  const rows = await crmDatabase().unsafe(`select data from ${name} where scope = $1`, [scope]);
   return rows[0]?.data ?? jsonCopy(initial);
 }
 export async function changeData<T>(block: Block, scope: string, initial: T, change: (state: T) => void): Promise<T> {
@@ -61,7 +67,7 @@ export async function changeData<T>(block: Block, scope: string, initial: T, cha
     memory.set(key, stored);
     return jsonCopy(stored);
   }
-  return await database().begin(async tx => {
+  return await crmDatabase().begin(async tx => {
     // Bind serialized JSON as text so the driver does not encode the string a second time.
     await tx.unsafe(`insert into ${name} (scope, data) values ($1, $2::text::jsonb) on conflict (scope) do nothing`, [scope, documentJson(initial)]);
     const rows = await tx.unsafe(`select data from ${name} where scope = $1 for update`, [scope]);
@@ -84,7 +90,7 @@ export function text(value: unknown, label: string, max = 200, required = true):
 
 const MAX_BODY_BYTES = 20_000;
 const shorterEntry = () => new CrmProblem("Please use a shorter entry.");
-async function readBody(request: Request): Promise<Record<string, unknown>> {
+export async function readBody(request: Request): Promise<Record<string, unknown>> {
   if (request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !== "application/json") throw new CrmProblem("Please check the form and try again.", 415);
   const declared = request.headers.get("content-length");
   if (declared !== null) {

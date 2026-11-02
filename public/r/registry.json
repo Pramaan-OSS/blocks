@@ -873,6 +873,292 @@
           "target": "lib/pramaan/crm-data.ts"
         }
       ]
+    },
+    {
+      "name": "profiles",
+      "type": "registry:block",
+      "title": "Profiles",
+      "description": "Private-by-default public profiles and photo uploads. Licence: MIT.",
+      "dependencies": [
+        "postgres@3.4.7",
+        "server-only@0.0.1",
+        "@pramaan/sdk@0.1.4"
+      ],
+      "registryDependencies": [
+        "button",
+        "alert-dialog",
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/pramaan-core/lib/pramaan/server.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/server.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/session.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/session.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-platform.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-platform.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-assessment.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-assessment.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-memory.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-memory.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-consent.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-consent.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-activity.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-activity.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-catalogue.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-catalogue.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-wave3.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-wave3.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/client.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/client.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/plain.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/plain.ts"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/states.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/states.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/parts.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/parts.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/confirm-action.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/confirm-action.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/fields.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/fields.tsx"
+        },
+        {
+          "path": "registry/crm-data/lib/pramaan/crm-data.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/crm-data.ts"
+        },
+        {
+          "path": "registry/moderation/src/db/migrations/crm_moderation_001.sql",
+          "type": "registry:file",
+          "target": "src/db/migrations/crm_moderation_001.sql"
+        },
+        {
+          "path": "registry/moderation/lib/pramaan/moderation.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/moderation.ts"
+        },
+        {
+          "path": "registry/moderation/lib/pramaan/social-context.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/social-context.ts"
+        },
+        {
+          "path": "registry/profiles/src/db/migrations/crm_profiles_001.sql",
+          "type": "registry:file",
+          "target": "src/db/migrations/crm_profiles_001.sql"
+        },
+        {
+          "path": "registry/profiles/lib/pramaan/profiles.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/profiles.ts"
+        },
+        {
+          "path": "registry/profiles/components/pramaan/profiles/profile-panel.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/profiles/profile-panel.tsx"
+        },
+        {
+          "path": "registry/profiles/app/profiles/[person]/page.tsx",
+          "type": "registry:file",
+          "target": "app/profiles/[person]/page.tsx"
+        },
+        {
+          "path": "registry/profiles/app/api/pramaan/profiles/route.ts",
+          "type": "registry:file",
+          "target": "app/api/pramaan/profiles/route.ts"
+        },
+        {
+          "path": "registry/upload/lib/pramaan/upload.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/upload.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/public-guard.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/public-guard.ts"
+        }
+      ]
+    },
+    {
+      "name": "moderation",
+      "type": "registry:block",
+      "title": "Moderation",
+      "description": "Report, hide, block and review with an audit trail. Licence: MIT.",
+      "dependencies": [
+        "postgres@3.4.7",
+        "server-only@0.0.1",
+        "@pramaan/sdk@0.1.4"
+      ],
+      "registryDependencies": [
+        "button",
+        "alert-dialog",
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/pramaan-core/lib/pramaan/server.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/server.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/session.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/session.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-platform.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-platform.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-assessment.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-assessment.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-memory.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-memory.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-consent.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-consent.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-activity.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-activity.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-catalogue.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-catalogue.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/fake-wave3.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/fake-wave3.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/client.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/client.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/plain.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/plain.ts"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/states.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/states.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/parts.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/parts.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/confirm-action.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/confirm-action.tsx"
+        },
+        {
+          "path": "registry/pramaan-core/components/pramaan/fields.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/fields.tsx"
+        },
+        {
+          "path": "registry/crm-data/lib/pramaan/crm-data.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/crm-data.ts"
+        },
+        {
+          "path": "registry/moderation/src/db/migrations/crm_moderation_001.sql",
+          "type": "registry:file",
+          "target": "src/db/migrations/crm_moderation_001.sql"
+        },
+        {
+          "path": "registry/moderation/lib/pramaan/moderation.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/moderation.ts"
+        },
+        {
+          "path": "registry/moderation/lib/pramaan/social-context.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/social-context.ts"
+        },
+        {
+          "path": "registry/moderation/components/pramaan/moderation/moderation-panel.tsx",
+          "type": "registry:component",
+          "target": "components/pramaan/moderation/moderation-panel.tsx"
+        },
+        {
+          "path": "registry/moderation/app/api/pramaan/moderation/route.ts",
+          "type": "registry:file",
+          "target": "app/api/pramaan/moderation/route.ts"
+        },
+        {
+          "path": "registry/pramaan-core/lib/pramaan/public-guard.ts",
+          "type": "registry:lib",
+          "target": "lib/pramaan/public-guard.ts"
+        }
+      ]
     }
   ]
 }

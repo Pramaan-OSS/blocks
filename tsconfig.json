@@ -120,6 +120,11 @@
       "@/lib/pramaan/password-reset-sender": ["./registry/password-reset/lib/pramaan/password-reset-sender.ts"],
       "@/lib/pramaan/password-reset-runtime": ["./registry/password-reset/lib/pramaan/password-reset-runtime.ts"],
       "@/components/pramaan/password-reset/*": ["./registry/password-reset/components/pramaan/password-reset/*"],
+      "@/lib/pramaan/profiles": ["./registry/profiles/lib/pramaan/profiles.ts"],
+      "@/lib/pramaan/moderation": ["./registry/moderation/lib/pramaan/moderation.ts"],
+      "@/lib/pramaan/social-context": ["./registry/moderation/lib/pramaan/social-context.ts"],
+      "@/components/pramaan/profiles/*": ["./registry/profiles/components/pramaan/profiles/*"],
+      "@/components/pramaan/moderation/*": ["./registry/moderation/components/pramaan/moderation/*"],
       "@/*": [
         "./*"
       ]

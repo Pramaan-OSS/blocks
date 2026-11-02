@@ -125,3 +125,9 @@ Name a block's component files differently from its server file in `lib/pramaan/
 MIT (see `LICENSE`). Every block is MIT too.
 
 Password recovery: see [password-reset](registry/password-reset/README.md) for reset links, signed-in password changes and private email delivery. The demo is at `/password-reset`.
+
+Profiles and community safety: [profiles](registry/profiles/README.md) adds a public page with
+private-by-default fields and photo uploads; [moderation](registry/moderation/README.md)
+adds reporting, blocking and an owner/admin review queue. Demo pages: `/profiles` and
+`/moderation`. Both use app-owned Postgres with numbered migrations and the shared fake.
+Optional text screening is off by default; image screening is recorded in gap 76.

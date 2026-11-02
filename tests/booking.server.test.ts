@@ -74,7 +74,10 @@ describe("booking server half", () => {
   it("refuses a time that isn't on offer, and bad details, before any event is made", async () => {
     connect();
     const [first] = (await slots()).slots;
-    const at3am = new Date(Date.parse(first.start) - 12 * 3_600_000).toISOString();
+    // Keep the off-hours probe in the future, even when today has open slots.
+    const offHours = new Date(Date.parse(first.start) + 86_400_000);
+    offHours.setUTCHours(3, 0, 0, 0);
+    const at3am = offHours.toISOString();
     for (const [body, words] of [
       [{ start: at3am, ...visitor }, "isn't one of the open times"],
       [{ start: first.start, ...visitor, name: "" }, "Enter your name"],

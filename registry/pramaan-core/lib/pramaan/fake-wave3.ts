@@ -26,6 +26,13 @@ type Handler = (c: FakeCtx, b: Body) => Response;
 
 const handlers: Record<string, Handler> = {};
 
+// Advisory classification fixture. Unknown results still require human review.
+handlers["text.classify"] = (c, b) => {
+  if (typeof b.text !== "string" || !b.text || b.text.length > 20000) return c.fail(400, "invalid_request", "Enter some text.");
+  const category = /spam/i.test(b.text) ? "spam" : /abusive/i.test(b.text) ? "abusive" : /sexual/i.test(b.text) ? "sexual" : "safe";
+  return c.json(200, { primaryCategory: category, confidence: 0.95, allCategories: [{ category, confidence: 0.95 }] });
+};
+
 // ---- checkout (payments.checkout.*) ----
 
 const CURRENCY = /^[a-z]{3}$/;
