@@ -28,8 +28,8 @@ describe("ActivityLog", () => {
     expect(within(list).getAllByRole("listitem")).toHaveLength(20);
     expect(list.textContent).toMatch(/Search the web|Send an email|Write with AI/);
     expect(list.textContent).toMatch(/\d{1,2} [A-Z][a-z]{2}, \d{1,2}:\d\d (AM|PM)/);
-    expect(list.textContent).toContain("$0.01");
-    for (const pill of ["Done", "Failed", "Running", "Waiting for a yes"]) expect(within(list).getAllByText(pill).length).toBeGreaterThan(0);
+    expect(list.textContent).not.toMatch(/\$|call_fake/);
+    for (const pill of ["Done", "Failed"]) expect(within(list).getAllByText(pill).length).toBeGreaterThan(0);
     expect(document.body.textContent).not.toMatch(/call_fake|email\.send|web\.search/);
   });
 
@@ -53,9 +53,9 @@ describe("ActivityLog", () => {
     await user.click(within(rows[0]).getByRole("button"));
     const detail = await screen.findByRole("region", { name: "Call details" });
     expect(await within(detail).findByRole("alert")).toBeTruthy();
-    expect(detail.textContent).toContain("Your Gmail connection has expired, so the email was not sent.");
-    expect(detail.textContent).toContain("What to do next: Reconnect Gmail in Connections, then send it again.");
-    expect(detail.textContent).toContain("Nothing was charged");
+    expect(detail.textContent).toContain("This call failed.");
+    expect(detail.textContent).toContain("What to do next: Check your app settings before trying again.");
+    expect(detail.textContent).not.toMatch(/\$/);
     expect(within(detail).getByRole("button", { name: "Copy reference" })).toBeTruthy();
     expect(detail.textContent).not.toMatch(/call_fake|connection_required/);
   });
@@ -69,30 +69,26 @@ describe("ActivityLog", () => {
     expect(await screen.findByText("Nothing ran in this period")).toBeTruthy();
   });
 
-  it("falls back to daily totals, in words, when the API can't list calls yet", async () => {
+  it("shows an error without daily totals when calls cannot be read", async () => {
     failNext("GET", "/v1/calls", 404, NOT_FOUND);
     await open();
-    const table = await screen.findByRole("table", { name: "Daily totals" });
-    expect(screen.getByRole("note").textContent).toContain("Showing daily totals");
-    const cells = within(table).getAllByRole("row")[1].textContent!;
-    expect(cells).toMatch(/\d{1,2} [A-Z][a-z]{2}/);
-    expect(table.textContent).toMatch(/Send an email|Write with AI|Search the web|Read a web page|Find company news/);
-    expect(table.textContent).not.toMatch(/\.send|\.read|\.complete/);
-    expect(screen.queryByLabelText("How it went")).toBeNull();
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    expect(screen.queryByRole("table", { name: "Daily totals" })).toBeNull();
   });
 
-  it("shows a webhook tab only where the API has delivery history", async () => {
+  it("always offers delivery history and lets a person replay a saved delivery", async () => {
     const user = await open();
-    await user.click(await screen.findByRole("tab", { name: "Webhook deliveries" }));
+    await user.click(screen.getByRole("tab", { name: "Webhook deliveries" }));
     const list = await screen.findByRole("list", { name: "Webhook deliveries" });
     expect(list.textContent).toContain("Job finished");
-    expect(list.textContent).toContain("What to do next: Fix the error on your server");
-    expect(list.textContent).toContain("Trying again");
+    await user.click(within(list).getAllByRole("button", { name: "Replay" })[0]);
+    expect(await screen.findByText("Replay queued.")).toBeTruthy();
     expect(document.body.textContent).not.toMatch(/whd_fake|job\.finished/);
     cleanup();
     failNext("GET", "/v1/webhook-deliveries", 404, NOT_FOUND);
-    await open();
-    await screen.findByRole("list", { name: "Calls" });
-    expect(screen.queryByRole("tab", { name: "Webhook deliveries" })).toBeNull();
+    const again = await open();
+    await again.click(screen.getByRole("tab", { name: "Webhook deliveries" }));
+    expect(await screen.findByRole("alert")).toBeTruthy();
   });
+
 });

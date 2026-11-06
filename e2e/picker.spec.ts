@@ -15,7 +15,7 @@ test("picker: find an action in plain words, answer the question, run a read-onl
   await expect(page.getByRole("list", { name: "Matches" }).getByRole("listitem")).toHaveCount(2);
   await page.getByRole("button", { name: /Search the web/ }).click();
   await page.getByLabel(/Search for/).fill("pramaan");
-  await page.getByRole("button", { name: "Get the price" }).click();
+  await page.getByRole("button", { name: "Check before running" }).click();
   await page.getByRole("button", { name: "Run it", exact: true }).click();
   await page.getByRole("alertdialog").getByRole("button", { name: "Run it", exact: true }).click();
   await expect(page.getByLabel("What came back")).toContainText("Results for pramaan");
@@ -26,7 +26,7 @@ test("picker: find an action in plain words, answer the question, run a read-onl
   await page.getByRole("region", { name: "A quick question" }).getByRole("button", { name: "Send a text message" }).click();
   await page.getByLabel(/^To/).fill("+15555550123");
   await page.getByLabel(/Message/).fill("Your table is ready.");
-  await page.getByRole("button", { name: "Get the price" }).click();
+  await page.getByRole("button", { name: "Check before running" }).click();
   await page.getByRole("button", { name: "Ask for a yes", exact: true }).click();
   await page.getByRole("alertdialog").getByRole("button", { name: "Ask for a yes", exact: true }).click();
   await expect(page.getByText(/Waiting for a yes/)).toBeVisible();

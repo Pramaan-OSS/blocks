@@ -10,7 +10,7 @@
 
 import { assessmentRoutes, type AssessmentState } from "./fake-assessment";
 import { type ActivityState, activityRoutes } from "./fake-activity";
-import { type ConsentState, consentRoutes } from "./fake-consent";
+import { type ConsentState, applyConsentRemoval, consentRoutes } from "./fake-consent";
 import { catalogueDescribe, catalogueRoutes } from "./fake-catalogue";
 import { addFakeMemory as addMemoryTo, memoryRoutes, type MemoryState } from "./fake-memory";
 import { completeConnection, platformRoutes, type PlatformState } from "./fake-platform";
@@ -31,6 +31,7 @@ export interface FakeApproval {
   decidedAt?: number;
   /** How many times the approved call ran. Must never pass 1. */
   runs: number;
+  result?: unknown;
 }
 
 export interface FakeMember {
@@ -176,7 +177,7 @@ export function decideElsewhere(id: string, status: "approved" | "denied", by = 
   const a = fakeState().approvals.get(id);
   if (!a) return;
   Object.assign(a, { status, decidedBy: by, decidedAt: fakeState().now() });
-  if (status === "approved") a.runs++;
+  if (status === "approved") { a.runs++; applyConsentRemoval(fakeState(), a); }
 }
 
 const json = (status: number, body: unknown) => Response.json(body, { status });
@@ -210,7 +211,7 @@ function job(a: FakeApproval, now: number) {
   if (expired) return failed("No member approved this call in time, so nothing ran. Send it with a new key.");
   if (a.status === "denied") return failed("A member declined this call, so nothing ran and nothing was charged.");
   if (a.status === "cancelled") return { ...base, status: "cancelled" };
-  if (a.status === "approved") return { ...base, status: "done", result: { status: "sent" } };
+  if (a.status === "approved") return { ...base, status: "done", result: a.result ?? { status: "sent" } };
   return { ...base, status: "running" };
 }
 
@@ -229,7 +230,7 @@ export async function fakePramaanFetch(url: string, init: RequestInit = {}): Pro
     const [failure] = s.failures.splice(f, 1);
     return json(failure.status, { error: failure.error });
   }
-  if (headers.authorization !== "Bearer fake") return fail(401, "unauthorized", "Send your API key as a Bearer token.");
+  if (!path.startsWith("/unsubscribe/") && headers.authorization !== "Bearer fake") return fail(401, "unauthorized", "Send your API key as a Bearer token.");
 
   const now = s.now();
   if (method === "GET" && path === "/v1/members") return json(200, { results: s.members });
@@ -267,7 +268,7 @@ export async function fakePramaanFetch(url: string, init: RequestInit = {}): Pro
         return fail(409, "conflict", "This approval was already decided, or it has expired.");
       const status = decision === "approve" ? "approved" : "denied";
       Object.assign(a, { status, decidedBy: member.member_id, decidedAt: now });
-      if (status === "approved") a.runs++;
+      if (status === "approved") { a.runs++; applyConsentRemoval(s, a); }
       return json(200, { approval_id: a.id, status: a.status, job: job(a, now) });
     }
   }

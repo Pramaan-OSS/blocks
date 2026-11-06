@@ -121,6 +121,7 @@ interface Job {
 }
 
 interface Conn {
+  logo_url?: string | null;
   connectionId: string;
   app: string;
   status: "active" | "pending" | "failed" | "expired" | "disabled" | "revoked";
@@ -300,9 +301,11 @@ const info = (m: Mission) => ({
   effect_class: m.effect_class,
   mode: "async",
   price_max_micro: priceOf(m),
+  price_micro: priceOf(m),
+  needs_connection: false,
   personal_data: false,
   available: true,
-  ...(requiresApproval(m) ? { requires_approval: true } : {}),
+  requires_approval: requiresApproval(m),
   capability_ids: m.steps.map((x) => x.capability),
 });
 
@@ -340,7 +343,7 @@ function capabilityRoute(c: FakeCtx, id: string): Response | undefined {
     const list = userConns(c, user);
     const app = typeof b.app === "string" ? b.app : undefined;
     if (id === "apps.connections.list") {
-      return c.json(200, { results: list.filter((x) => !app || x.app === app).map((x) => ({ app: x.app, status: x.status, connectedAt: x.connectedAt, access: x.access })) });
+      return c.json(200, { results: list.filter((x) => !app || x.app === app).map((x) => ({ app: x.app, logo_url: x.logo_url ?? null, status: x.status, connectedAt: x.connectedAt, access: x.access })) });
     }
     if (id === "apps.connections.list-detailed") {
       return c.json(200, { results: list.filter((x) => (!app || x.app === app) && x.status !== "revoked" && x.status !== "pending").map(connView) });
@@ -407,7 +410,7 @@ export function platformRoutes(c: FakeCtx): Response | undefined {
     });
   }
 
-  if (method === "GET" && path === "/v1/outcomes") return c.json(200, { results: MISSIONS.map(info) });
+  if (method === "GET" && path === "/v1/outcomes") return c.json(200, { results: MISSIONS.filter((m) => !c.url.searchParams.get("query") || c.url.searchParams.get("query")!.toLowerCase().split(/\s+/).some((w) => `${m.id} ${m.description}`.toLowerCase().includes(w))).map(info) });
   let m = path.match(/^\/v1\/outcomes\/([^/]+?)(\/estimate)?$/);
   if (m) {
     const mission = MISSIONS.find((x) => x.id === decodeURIComponent(m![1]));

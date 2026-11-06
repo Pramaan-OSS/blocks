@@ -5,8 +5,7 @@ import type { FakeCtx, FakeState } from "./fake";
 // approval in the approvals inbox, as an irreversible call made with a key does, and takes effect
 // once it is approved.
 //
-// Not in the OpenAPI: the organisation queue lives under /v1/internal/memory/admin, which
-// the real API opens to a signed-in admin session only. The fake lets a key send `Pramaan-Member`.
+// The public organisation queue requires a member-bound admin key in production.
 
 const DAY = 86_400_000;
 
@@ -58,6 +57,7 @@ function seedMemory(s: FakeState): MemoryState {
   add("user-42", "Likes a weekly summary on Monday mornings.", 21);
   add("user-42", "Is vegetarian and allergic to peanuts.", 9);
   add("user-42", "Is planning a trip to Lisbon in March.", 2);
+  add("mbr_owner", "Prefers short, clear answers.", 1);
   add("user-7", "Another person's private note that nobody else should ever see.", 5);
   m.org.push(
     { id: "mi_org_cand1", text: "The team writes customer emails in a friendly, plain tone.", kind: "org_candidate", status: "active" },
@@ -128,6 +128,12 @@ function capability(c: FakeCtx, id: string): Response | undefined {
   if (needsUser) return c.fail(400, "invalid_request", "scope.user is required: your end user's logical identifier.");
 
   switch (id) {
+    case "memory.member.profile.get": {
+      // Stands in for a key bound to this member: only that member's own facts.
+      const member = c.s.members.find((x) => x.member_id === user);
+      if (!member || c.headers["pramaan-member"] !== user) return c.fail(403, "forbidden", "Use your own member-bound key to read your profile.");
+      return c.json(200, { facts: mine().filter((i) => !i.deleteApproval).map((i) => ({ id: i.ref, text: i.text })) });
+    }
     case "memory.items.list": {
       const words = typeof b.keywords === "string" ? b.keywords.toLowerCase().split(/\s+/).filter(Boolean) : [];
       const rows = mine().filter((i) => words.every((w) => i.text.toLowerCase().includes(w))).sort((a, z) => z.createdAt - a.createdAt);
@@ -148,7 +154,7 @@ function capability(c: FakeCtx, id: string): Response | undefined {
       if (!item) return noItem();
       if (b.confirm !== true) return c.fail(400, "invalid_request", "Send confirm: true to delete this memory for good.");
       item.deleteApproval ??= c.addApproval({ capability: id, priceMicro: 0, input: { ref: item.ref }, requestedBy: { kind: "key" }, createdAt: c.now });
-      return c.json(202, { job_id: item.deleteApproval, status: "running", held_micro: 0 });
+      return c.json(202, { job_id: item.deleteApproval, approval_id: item.deleteApproval, status: "running", held_micro: 0 });
     }
     case "memory.scope.delete": {
       if (!user) return c.fail(400, "invalid_request", "scope.user is required to erase one person's memories.");
@@ -156,7 +162,7 @@ function capability(c: FakeCtx, id: string): Response | undefined {
       if (mine().length === 0) return c.json(200, { deletedCount: 0 });
       const approval = m.eraseApprovals.get(user) ?? c.addApproval({ capability: id, priceMicro: 0, input: { scope: b.scope }, requestedBy: { kind: "key" }, createdAt: c.now });
       m.eraseApprovals.set(user, approval);
-      return c.json(202, { job_id: approval, status: "running", held_micro: 0 });
+      return c.json(202, { job_id: approval, approval_id: approval, status: "running", held_micro: 0 });
     }
     case "memory.history.list": {
       const rows = m.changes.filter((x) => x.user === user && user !== "").sort((a, z) => z.at - a.at);
@@ -173,7 +179,7 @@ const isAdmin = (c: FakeCtx) => {
 
 function admin(c: FakeCtx): Response | undefined {
   const m = memory(c.s);
-  if (c.method === "GET" && c.path === "/v1/internal/memory/admin/queue") {
+  if (c.method === "GET" && c.path === "/v1/memory/admin/queue") {
     if (!isAdmin(c)) return c.fail(403, "forbidden", "Only workspace admins can manage org memory. Ask an admin to sign in.");
     return c.json(200, {
       enabled: true,
@@ -181,7 +187,7 @@ function admin(c: FakeCtx): Response | undefined {
       notices: m.org.filter((o) => o.kind === "org" && o.status === "active" && o.autoPromotedAt && !o.noticeReadAt).map((o) => ({ id: o.id, text: o.text, promotedAt: iso(o.autoPromotedAt!) })),
     });
   }
-  if (c.method === "POST" && c.path === "/v1/internal/memory/admin/decide") {
+  if (c.method === "POST" && c.path === "/v1/memory/admin/decide") {
     if (!isAdmin(c)) return c.fail(403, "forbidden", "Only workspace admins can manage org memory. Ask an admin to sign in.");
     const b = (c.body ?? {}) as { id?: unknown; action?: unknown };
     if (typeof b.id !== "string" || !["approve", "reject", "remove", "acknowledge"].includes(String(b.action)))

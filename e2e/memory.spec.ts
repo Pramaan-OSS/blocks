@@ -10,6 +10,7 @@ test("memory: search, delete one through the approvals inbox, see it in the chan
   await page.request.post("/api/demo", { data: { action: "reset" } });
 
   await page.goto("/memory");
+  await expect(page.getByRole("region", { name: "What it knows about me" })).toContainText("Prefers short, clear answers.");
   const list = page.getByRole("list", { name: "Memories" });
   await expect(list.getByRole("listitem")).toHaveCount(5);
   await expect(page.locator("body")).not.toContainText("Another person's");

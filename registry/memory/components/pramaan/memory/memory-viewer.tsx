@@ -51,6 +51,7 @@ function usePaged<T extends { ref?: string }>(url: string) {
 }
 
 function MyMemories({ approvalsHref }: { approvalsHref: string }) {
+  const profile = useResource<{ facts: { id: string; text: string }[] }>("/api/pramaan/memory/profile");
   const [typed, setTyped] = useState("");
   const [q, setQ] = useState("");
   const list = usePaged<Memory>(`/api/pramaan/memory${q ? `?q=${encodeURIComponent(q)}` : ""}`);
@@ -88,6 +89,10 @@ function MyMemories({ approvalsHref }: { approvalsHref: string }) {
 
   return (
     <div className="space-y-4">
+      <section aria-label="What it knows about me" className="pr-card space-y-2">
+        <h2>What it knows about me</h2>
+        {profile.error ? <ErrorState error={profile.error} onRetry={profile.reload} /> : !profile.data ? <LoadingState label="Loading your summary" /> : profile.data.facts.length === 0 ? <p>No active facts are remembered about you yet.</p> : <ul>{profile.data.facts.map((f) => <li key={f.id}>{f.text}</li>)}</ul>}
+      </section>
       <form
         className="flex flex-wrap items-end gap-2"
         role="search"

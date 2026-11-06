@@ -35,15 +35,15 @@ import { SuperpowerPicker } from "@/components/pramaan/picker/superpower-picker"
 - **A search box** ("What do you want to do?"). When the words fit several actions about equally,
   the API's one clarifying question shows with a button for each answer.
 - **Matches** by plain name ("Send a text message"), what each does, its kind (single action or
-  mission) and the most it can cost. Nothing that can't run now is offered. With no words it lists
+  mission), connection needs and approval needs. Nothing that can't run now is offered. With no words it lists
   the first 20; searching narrows them.
-- **Details:** the price, whether it needs a yes or a connected account, and a form built from the
+- **Details:** whether it needs a yes or a connected account, and a form built from the
   action's inputs (required fields are marked and checked before any call).
-- **Get the price** first, then **Run it** behind a confirm that shows the exact inputs and the
-  maximum price. A double click never runs it twice (one idempotency key per price).
+- **Check before running** first, then **Run it** behind a confirm that shows the exact inputs and the
+  readiness. Prices remain on the server. A double click never runs it twice (one idempotency key per price).
 - **Actions that send something** (an email, a text) say so, and "Ask for a yes" sends the request to
   the approvals inbox. It runs once, after the decision.
-- **Results** show as labelled lines, never raw JSON.
+- **Results** show a completion message, never raw JSON.
 - **Missions** show their steps and open in the mission runner; the picker doesn't run them itself.
 
 ## Calls it makes
@@ -52,7 +52,7 @@ Server only, from `app/api/pramaan/picker/`, with `PRAMAAN_API_KEY`:
 
 | Route in your app | Pramaan call |
 |---|---|
-| `GET /api/pramaan/picker?q=` | `GET /v1/capabilities?query=` and `GET /v1/outcomes` |
+| `GET /api/pramaan/picker?q=` | `GET /v1/capabilities?query=` and `GET /v1/outcomes?query=` |
 | `GET /api/pramaan/picker/{id}?kind=` | `GET /v1/capabilities/{id}` or `GET /v1/outcomes/{id}` |
 | `POST /api/pramaan/picker/{id}/estimate` | `POST /v1/capabilities/{id}/estimate` |
 | `POST /api/pramaan/picker/{id}/run` | `POST /v1/capabilities/{id}` with an `Idempotency-Key` |
@@ -68,3 +68,7 @@ Try it on the fake with `PRAMAAN_FAKE=1 pnpm dev` and open `/picker`.
 | `components/pramaan/picker/superpower-picker.tsx` | the screen |
 | `components/pramaan/schema-form.tsx` | the form builder, shared with the mission runner |
 | `lib/pramaan/*`, `components/pramaan/*` | shared by every block |
+
+Both search lists use `price_micro`, `requires_approval` and `needs_connection`. Mission matching
+is performed by the service. A capability estimate supplies `price_max_micro` and `can_run`; there
+is no `ready` field. A documented 202 running job remains waiting for approval.

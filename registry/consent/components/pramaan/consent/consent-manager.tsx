@@ -124,13 +124,11 @@ function AddForm({ onAdded }: { onAdded: () => void }) {
 }
 
 function Row({ e, canRemove, onRemoved }: { e: Entry; canRemove: boolean; onRemoved: (text: string, tone: StatusTone) => void }) {
-  const id = useId();
   const [open, setOpen] = useState(false);
-  const [address, setAddress] = useState("");
   const [problem, setProblem] = useState<string>();
   const source = SOURCE[e.source];
   // Only an entry the project added can be lifted; a person's own STOP or unsubscribe stays.
-  const removable = canRemove && e.source === "builder_api";
+  const removable = canRemove && e.source === "builder_api" && !e.removedAt;
   return (
     <li className="border-b last:border-0">
       <div className="pr-row" style={{ borderBottom: 0 }}>
@@ -139,6 +137,8 @@ function Row({ e, canRemove, onRemoved }: { e: Entry; canRemove: boolean; onRemo
           <span className="pr-row-sub">
             {CHANNEL[e.channel]} · added {formatDate(e.createdAt, { time: false })}
             {e.reason ? ` · ${e.reason}` : ""}
+            {e.createdBy ? " · addition recorded" : ""}
+            {e.removedAt ? ` · removed ${formatDate(e.removedAt)}${e.removedBy ? " (reviewer recorded)" : ""}` : ""}
           </span>
         </span>
         <span className="pr-row-side">
@@ -157,23 +157,18 @@ function Row({ e, canRemove, onRemoved }: { e: Entry; canRemove: boolean; onRemo
           onSubmit={async (ev) => {
             ev.preventDefault();
             try {
-              const r = await send<{ removed: number }>("/api/pramaan/consent/remove", { address, channel: e.channel });
-              if (r.removed === 0) setProblem("That doesn't match this entry. Type the whole phone number or email.");
-              else {
-                onRemoved(`Done. ${e.addressHint} can be messaged again on ${CHANNEL[e.channel].toLowerCase()}.`, "success");
-                setOpen(false);
-              }
+              const r = await send<{ removed?: number; status: string }>("/api/pramaan/consent/remove", { optOutId: e.optOutId });
+              onRemoved(r.status === "waiting_for_approval" ? "Removal is waiting for approval in the inbox." : "Removal completed.", r.status === "waiting_for_approval" ? "info" : "success");
+              setOpen(false);
             } catch (err) {
               setProblem(err instanceof ApiError ? err.message : "Something went wrong. Try again.");
             }
           }}
         >
-          <p className="text-sm">This lets them be messaged again. Your workspace keeps a record of who did it. Type their whole phone number or email to confirm.</p>
-          <Label htmlFor={id}>Whole phone number or email</Label>
-          <Input id={id} value={address} onChange={(ev) => { setAddress(ev.target.value); setProblem(undefined); }} />
+          <p className="text-sm">This requests approval to let them be messaged again. The workspace keeps a record of who approved it.</p>
           {problem && <p role="alert" className="text-sm text-destructive">{problem}</p>}
           <div className="flex gap-2">
-            <Button type="submit" disabled={address.trim() === ""}>
+            <Button type="submit" >
               Let them be messaged again
             </Button>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
@@ -194,8 +189,12 @@ export function ConsentManager() {
   const [extra, setExtra] = useState<Entry[]>([]);
   const [cursor, setCursor] = useState<string>();
   const [more, setMore] = useState(false);
-  const list = useResource<OptOutList>("/api/pramaan/consent");
   const [q, setQ] = useState("");
+  const [channel, setChannel] = useState("");
+  const [source, setSource] = useState("");
+  const [removed, setRemoved] = useState(false);
+  const filters = new URLSearchParams({ query: q, channel, source, removed: String(removed) });
+  const list = useResource<OptOutList>(`/api/pramaan/consent?${filters}`);
   const [note, setNote] = useState<{ text: string; tone: StatusTone }>();
   if (list.error && !list.data) return <ErrorState error={list.error} onRetry={list.reload} />;
   if (!list.data) return <LoadingState label="Loading opt-outs" />;
@@ -203,10 +202,10 @@ export function ConsentManager() {
   const next = more ? cursor : list.data.nextCursor;
   const rows = [...list.data.results, ...extra];
   const words = q.toLowerCase().trim();
-  const shown = words ? rows.filter((e) => `${e.addressHint} ${CHANNEL[e.channel]} ${e.reason ?? ""} ${SOURCE[e.source].text}`.toLowerCase().includes(words)) : rows;
+  const shown = rows;
 
   async function showMore() {
-    const page = await api<OptOutList>(`/api/pramaan/consent?cursor=${encodeURIComponent(next!)}`);
+    const page = await api<OptOutList>(`/api/pramaan/consent?${filters}&cursor=${encodeURIComponent(next!)}`);
     setExtra((x) => [...x, ...page.results]);
     setCursor(page.nextCursor);
     setMore(true);
@@ -221,20 +220,27 @@ export function ConsentManager() {
 
       <section aria-label="Opt-out list" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2>People you won't message</h2>
+          <h2>{removed ? "Removal history" : "People you won't message"}</h2>
+          <select aria-label="Filter channel" className="pr-select" value={channel} onChange={(e) => { setChannel(e.target.value); setExtra([]); setMore(false); }}>
+            <option value="">Any channel</option>{Object.entries(CHANNEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <select aria-label="Filter source" className="pr-select" value={source} onChange={(e) => { setSource(e.target.value); setExtra([]); setMore(false); }}>
+            <option value="">Any source</option>{Object.entries(SOURCE).map(([k, v]) => <option key={k} value={k}>{v.text}</option>)}
+          </select>
+          <Button variant="outline" onClick={() => { setRemoved(!removed); setExtra([]); setMore(false); }}>{removed ? "Active opt-outs" : "Removal history"}</Button>
           <div className="space-y-1.5">
             <Label htmlFor="consent-search">Search the list</Label>
-            <Input id="consent-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Digits or a reason" />
+            <Input id="consent-search" value={q} onChange={(e) => { setQ(e.target.value); setExtra([]); setMore(false); }} placeholder="Part of the shortened address" />
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">Addresses are shown shortened, to protect people's privacy.{!list.data.viewer.canApprove && " Only an approver can let someone be messaged again."}</p>
+        <p className="text-sm text-muted-foreground">Addresses are shown shortened, to protect people's privacy. Removal needs approval.</p>
         <StatusMessage text={note?.text} tone={note?.tone} />
         {shown.length === 0 ? (
-          <EmptyState title={words ? "Nothing matches" : "Nobody has opted out"}>{words ? "Search covers the entries loaded here." : "People you add, and people who reply STOP or unsubscribe, are listed here."}</EmptyState>
+          <EmptyState title={words ? "Nothing matches" : "Nobody has opted out"}>{words ? "Try another part of the shortened address." : "People you add, and people who reply STOP or unsubscribe, are listed here."}</EmptyState>
         ) : (
           <ul className="pr-rows" aria-label="Opt-outs">
             {shown.map((e) => (
-              <Row key={e.optOutId} e={e} canRemove={list.data!.viewer.canApprove} onRemoved={(text, tone) => { setNote({ text, tone }); setExtra([]); setMore(false); list.reload(); announceChange(); }} />
+              <Row key={e.optOutId} e={e} canRemove={true} onRemoved={(text, tone) => { setNote({ text, tone }); setExtra([]); setMore(false); list.reload(); announceChange(); }} />
             ))}
           </ul>
         )}
@@ -268,49 +274,18 @@ export function ConsentManager() {
   );
 }
 
-/**
- * A public page for your own contacts to stop hearing from you. It needs no sign-in and never says
- * whether an address was already listed.
- */
-export function UnsubscribePage({ title = "Stop hearing from us" }: { title?: string }) {
-  const id = useId();
-  const [address, setAddress] = useState("");
-  const [channel, setChannel] = useState<string>("all");
+/** Uses the signed recipient link from a message. */
+export function UnsubscribePage({ title = "Stop hearing from us", link }: { title?: string; link?: string }) {
   const [state, setState] = useState<"idle" | "done" | { error: string }>("idle");
-  if (state === "done")
-    return (
-      <div role="status" className="pr-card space-y-1">
-        <h2>Done</h2>
-        <p className="text-sm">You won't hear from us on that {channel === "all" ? "phone number or email" : CHANNEL[channel as Scope].toLowerCase()} again.</p>
-      </div>
-    );
-  return (
-    <form
-      className="pr-card max-w-md space-y-4"
-      aria-label={title}
-      onSubmit={async (e) => {
-        e.preventDefault();
-        try {
-          await send("/api/pramaan/consent/unsubscribe", { address, channel });
-          setState("done");
-        } catch (err) {
-          setState({ error: err instanceof ApiError ? err.message : "Something went wrong. Try again." });
-        }
-      }}
-    >
-      <h2>{title}</h2>
-      <div className="space-y-1.5">
-        <Label htmlFor={`${id}-a`}>Your phone number or email</Label>
-        <Input id={`${id}-a`} value={address} onChange={(e) => setAddress(e.target.value)} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor={`${id}-c`}>Stop</Label>
-        <ChannelSelect id={`${id}-c`} value={channel} onChange={setChannel} />
-      </div>
-      {typeof state === "object" && <p role="alert" className="text-sm text-destructive">{state.error}</p>}
-      <Button type="submit" disabled={address.trim() === ""}>
-        Unsubscribe
-      </Button>
-    </form>
-  );
+  if (!link) return <p>Open the unsubscribe link in your message to stop hearing from us.</p>;
+  if (state === "done") return <p role="status">You are unsubscribed from emails from this app.</p>;
+  return <form className="pr-card max-w-md space-y-4" aria-label={title} onSubmit={async (e) => {
+    e.preventDefault();
+    try { await send("/api/pramaan/consent/unsubscribe", { link }); setState("done"); }
+    catch (err) { setState({ error: err instanceof Error ? err.message : "Try again later." }); }
+  }}>
+    <h2>{title}</h2><p>Stop emails to the recipient of this message.</p>
+    {typeof state === "object" && <p role="alert">{state.error}</p>}
+    <Button type="submit">Unsubscribe</Button>
+  </form>;
 }

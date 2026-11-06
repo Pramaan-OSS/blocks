@@ -19,6 +19,7 @@ export interface AppEntry {
   readonly note?: string;
   /** Your own logo; apps without one get the built-in logo or a lettered tile. */
   readonly icon?: ReactNode;
+  readonly logo_url?: string | null;
 }
 
 /** The apps offered with a Connect button. Pass your own `apps` to change them. */
@@ -147,7 +148,7 @@ export function ConnectionsManager({
             return (
               <li key={app.id} aria-label={app.label} className="pr-row">
                 <div className="pr-row-main flex items-center gap-3">
-                <AppIcon id={app.id} label={app.label} icon={app.icon} />
+                <AppIcon id={app.id} label={app.label} icon={app.icon} logoUrl={conn?.logo_url ?? app.logo_url} />
                 <div>
                   <p className="flex items-center gap-2 font-semibold">
                     {app.label} <StatusPill tone={status.tone}>{status.text}</StatusPill>

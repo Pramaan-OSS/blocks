@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { failNext, fakeState, resetFake } from "@/lib/pramaan/fake";
+import { runChoice } from "@/lib/pramaan/picker";
 import { get, post } from "./harness";
 
 const P = "/api/pramaan/picker";
@@ -59,6 +60,21 @@ describe("picker routes", () => {
     expect(status).toBe(200);
     expect(body.status).toBe("done");
     expect(body.result.results[0].title).toContain("pramaan");
+  });
+
+  it("tells an async job apart from one waiting for a yes, by the documented 202", async () => {
+    vi.stubEnv("PRAMAAN_FAKE", "0");
+    vi.stubEnv("PRAMAAN_API_KEY", "test");
+    const accepted = (body: object) => vi.stubGlobal("fetch", async () => Response.json(body, { status: 202 }));
+    try {
+      accepted({ job_id: "job_1", status: "running", held_micro: 0 });
+      expect(await runChoice("web.search", {}, "k1")).toEqual({ status: "running" });
+      accepted({ job_id: "apr_1", approval_id: "apr_1", status: "running", held_micro: 0 });
+      expect(await runChoice("web.search", {}, "k2")).toEqual({ status: "waiting_for_approval" });
+    } finally {
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    }
   });
 
   it("an action that sends waits for approval, once per click, and runs once after the yes", async () => {

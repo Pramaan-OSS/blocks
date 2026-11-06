@@ -159,6 +159,7 @@ const examView = (e: Exam) => ({
 
 const inviteView = (i: Invite) => ({
   status: i.status,
+  link: i.link,
   expiresAt: iso(i.expiresAt),
   createdAt: iso(i.createdAt),
   ...(i.emailedAt ? { emailedAt: iso(i.emailedAt) } : {}),

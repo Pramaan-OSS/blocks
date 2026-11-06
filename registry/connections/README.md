@@ -93,3 +93,7 @@ Try it on the fake with `PRAMAAN_FAKE=1 pnpm dev` and open `/connections`.
 | `app/connections/return/page.tsx` | the page people land on after signing in |
 | `components/pramaan/connections/connections-manager.tsx` | the list and the return content |
 | `lib/pramaan/*`, `components/pramaan/*` | shared by every block |
+
+Connection rows use `logo_url` from `apps.connections.list` when present. An absent or failed
+remote image falls back to `app-icon.tsx`. Catalogue callers can pass through the same optional
+`logo_url` from `apps.catalog.search`; the block does not make paid catalogue calls to load logos.

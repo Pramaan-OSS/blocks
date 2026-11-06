@@ -39,6 +39,8 @@ describe("assessment routes", () => {
     expect(invited[0].link).toMatch(/^https:\/\//);
 
     const rows = (await json(await get(owner, `${A}/exams/${ref}/invitations`))).body.results;
+    expect(rows[0].link).toBe(invited[0].link);
+    expect((await (await get(owner, `${A}/invitations/${invited[0].ref}`)).json()).link).toBe(invited[0].link);
     expect(rows.filter((r: { ref: string }) => invited.some((i: { ref: string }) => i.ref === r.ref))).toHaveLength(2);
 
     // Not graded yet: the answer says so, in the API's own words.

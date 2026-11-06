@@ -38,6 +38,7 @@ export interface Question {
 export type InviteStatus = "pending" | "opened" | "started" | "completed" | "expired" | "revoked";
 
 export interface Invitation {
+  readonly link?: string;
   readonly ref?: string;
   readonly status: InviteStatus;
   readonly expiresAt: string;

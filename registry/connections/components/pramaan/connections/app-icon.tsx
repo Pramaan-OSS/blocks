@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 
 // App logos for the connections list. Paths from Simple Icons (CC0-1.0, simpleicons.org); the
 // Outlook icon is Microsoft's own (public/pramaan/logos/outlook.svg). Brand names and logos belong
@@ -22,12 +24,14 @@ const LOGOS: Record<string, { readonly hex: string; readonly path: string }> = {
 };
 
 /** A 32px logo tile for an app; decorative, since the app's name is always shown beside it. */
-export function AppIcon({ id, label, icon }: { id: string; label: string; icon?: ReactNode }) {
+export function AppIcon({ id, label, icon, logoUrl }: { id: string; label: string; icon?: ReactNode; logoUrl?: string | null }) {
+  const [failed, setFailed] = useState<string>();
+  const remote = logoUrl?.startsWith("https://") && failed !== logoUrl ? logoUrl : undefined;
   const logo = LOGOS[id];
   const file = FILES[id];
   return (
     <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background">
-      {icon ??
+      {remote ? <img src={remote} alt="" className="size-5" onError={() => setFailed(remote)} /> : icon ??
         (file ? (
           // biome-ignore lint/performance/noImgElement: a static local SVG, no optimisation needed
           <img src={file} alt="" className="size-5" />

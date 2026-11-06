@@ -1,3 +1,5 @@
+import * as memoryProfile from "../registry/memory/app/api/pramaan/memory/profile/route";
+import * as activityReplay from "../registry/activity/app/api/pramaan/activity/deliveries/[id]/replay/route";
 import { vi } from "vitest";
 import * as approvals from "@/registry/approvals/app/api/pramaan/approvals/route";
 import * as approval from "@/registry/approvals/app/api/pramaan/approvals/[id]/route";
@@ -105,6 +107,7 @@ const routes: [RegExp, Record<string, Handler | undefined>][] = [
   [/^\/api\/pramaan\/memory\/changes$/, memoryChanges],
   [/^\/api\/pramaan\/memory\/org$/, memoryOrg],
   [/^\/api\/pramaan\/memory\/org\/decide$/, memoryOrgDecide],
+  [/^\/api\/pramaan\/memory\/profile$/, memoryProfile],
   [/^\/api\/pramaan\/memory\/([^/]+)$/, memoryOne],
   [/^\/api\/pramaan\/picker$/, picker],
   [/^\/api\/pramaan\/picker\/([^/]+)$/, pickerOne],
@@ -114,6 +117,7 @@ const routes: [RegExp, Record<string, Handler | undefined>][] = [
   [/^\/api\/pramaan\/consent\/remove$/, consentRemove],
   [/^\/api\/pramaan\/consent\/check$/, consentCheck],
   [/^\/api\/pramaan\/consent\/unsubscribe$/, consentStop],
+  [/^\/api\/pramaan\/activity\/deliveries\/([^/]+)\/replay$/, activityReplay],
   [/^\/api\/pramaan\/activity$/, activity],
   [/^\/api\/pramaan\/activity\/deliveries$/, activityDeliveries],
   [/^\/api\/pramaan\/activity\/([^/]+)$/, activityOne],

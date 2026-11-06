@@ -77,7 +77,7 @@ export function CandidateTracker({
             // Where this browser doesn't know the email, a number: never the invitation's id.
             const name = mounted ? candidateName(r.ref, i) : `Candidate ${i + 1}`;
             const unused = r.status === "pending" || r.status === "opened";
-            const page = mounted ? linkFor(r.ref) : undefined;
+            const page = r.link || (mounted ? linkFor(r.ref) : undefined);
             return (
               <TableRow key={ref} data-state={selected === r.ref ? "selected" : undefined}>
                 <TableCell>

@@ -88,10 +88,11 @@ const info = (c: Cap) => ({
   description: c.description,
   effect_class: c.effect_class,
   mode: "sync",
+  price_micro: c.price_estimate_micro,
   price_estimate_micro: c.price_estimate_micro,
   available: true,
   needs_connection: false,
-  ...(c.requires_approval ? { requires_approval: true } : {}),
+  requires_approval: c.requires_approval === true,
 });
 
 /** The fuller answer for GET /v1/capabilities/{id}. */
@@ -140,7 +141,7 @@ export function catalogueRoutes(c: FakeCtx): Response | undefined {
   const bad = problem(cap, input);
   if (m[2]) {
     const available = platform(c.s).balanceMicro - [...c.s.holds.values()].reduce((n, x) => n + x, 0);
-    return c.json(200, { price_max_micro: cap.price_estimate_micro, ready: !bad, can_run: !bad && available >= cap.price_estimate_micro, ...(bad ? { message: bad } : {}) });
+    return c.json(200, { price_max_micro: cap.price_estimate_micro, balance_micro: available, can_run: !bad && available >= cap.price_estimate_micro, ...(bad ? { message: bad } : {}) });
   }
   if (bad) return c.fail(400, "invalid_request", bad);
   if (cap.requires_approval) {
@@ -149,7 +150,7 @@ export function catalogueRoutes(c: FakeCtx): Response | undefined {
     const prior = key ? p.idem.get(`cat:${cap.id}:${key}`) : undefined;
     const approval = prior ?? c.addApproval({ capability: cap.id, priceMicro: cap.price_estimate_micro, input, requestedBy: { kind: "key" }, createdAt: c.now });
     if (key) p.idem.set(`cat:${cap.id}:${key}`, approval);
-    return c.json(202, { job_id: approval, status: "running", held_micro: 0 });
+    return c.json(202, { job_id: approval, approval_id: approval, status: "running", held_micro: 0 });
   }
   return c.json(200, cap.run!(input));
 }

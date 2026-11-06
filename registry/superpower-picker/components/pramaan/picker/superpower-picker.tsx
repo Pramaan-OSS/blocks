@@ -9,7 +9,7 @@ import { InputFields } from "@/components/pramaan/fields";
 import { StatusPill } from "@/components/pramaan/parts";
 import { buildInput, type FormValues, SchemaForm } from "@/components/pramaan/schema-form";
 import { EmptyState, ErrorState, LoadingState, StatusMessage } from "@/components/pramaan/states";
-import { ApiError, announceChange, api, atMost, upTo, useResource } from "@/lib/pramaan/client";
+import { ApiError, announceChange, api, useResource } from "@/lib/pramaan/client";
 import type { Choice, Detail, Estimate, RunResult, SearchResult } from "@/lib/pramaan/picker";
 
 const post = <T,>(url: string, body: unknown, headers: Record<string, string> = {}) =>
@@ -78,7 +78,7 @@ function ChoiceDetail({ id, kind, approvalsHref, missionsHref, walletHref }: { i
         <Pills c={c} />
       </div>
       <p className="text-sm text-muted-foreground">{c.description}</p>
-      <p className="text-sm">Costs <strong>{upTo(c.priceMicro)}</strong>.</p>
+
 
       {c.kind === "mission" ? (
         <>
@@ -87,7 +87,7 @@ function ChoiceDetail({ id, kind, approvalsHref, missionsHref, walletHref }: { i
               <li key={s.label} className="pr-row text-sm">
                 <span className="pr-row-main">
                   <b>{s.label}</b>
-                  <span className="pr-row-sub">{upTo(s.priceMicro)}{s.needsApproval ? " · needs a person's yes" : ""}</span>
+                  <span className="pr-row-sub">{s.needsApproval ? "Needs a person's yes" : ""}</span>
                 </span>
               </li>
             ))}
@@ -107,21 +107,21 @@ function ChoiceDetail({ id, kind, approvalsHref, missionsHref, walletHref }: { i
           >
             <SchemaForm schema={c.inputSchema} values={values} errors={errors} onChange={(v) => { setValues(v); setEstimate(undefined); setOutcome(undefined); }} />
             <Button type="submit" disabled={busy}>
-              {busy ? "Getting the price…" : "Get the price"}
+              {busy ? "Checking…" : "Check before running"}
             </Button>
           </form>
 
           {problem && <ErrorState error={problem} walletHref={walletHref} />}
 
           {estimate && !outcome && (
-            <section aria-label="Price" className="pr-sunk space-y-3">
-              <p className="text-sm">This costs <strong>{atMost(estimate.priceMaxMicro)}</strong>.</p>
+            <section aria-label="Readiness" className="pr-sunk space-y-3">
+              <p className="text-sm">{estimate.canRun ? "Ready to request." : "This cannot run yet."}</p>
               {!estimate.ready && <p role="alert" className="text-sm text-destructive">{estimate.message ?? "Something is still missing before this can run."}</p>}
               {estimate.topUp && <ErrorState error={new ApiError(estimate.topUp.message, "spend_cap_reached", undefined, 402, { ...estimate.topUp, links: [...estimate.topUp.links] })} walletHref={walletHref} />}
               <ConfirmAction
                 label={c.needsApproval ? "Ask for a yes" : "Run it"}
                 title={`${c.name}?`}
-                description={c.needsApproval ? `It goes to the approvals inbox first and runs only after a yes. It costs ${atMost(estimate.priceMaxMicro)}.` : `It runs once and costs ${atMost(estimate.priceMaxMicro)}.`}
+                description={c.needsApproval ? "It goes to the approvals inbox first and runs only after a yes." : "It runs once after you confirm."}
                 details={<InputFields input={input} label="Exact inputs" empty="This needs no input." />}
                 confirmLabel={c.needsApproval ? "Ask for a yes" : "Run it"}
                 disabled={!estimate.ready || !estimate.canRun}
@@ -135,6 +135,9 @@ function ChoiceDetail({ id, kind, approvalsHref, missionsHref, walletHref }: { i
               <h3>Result</h3>
               <InputFields input={outcome.result} label="What came back" empty="It ran and returned nothing to show." />
             </section>
+          )}
+          {outcome?.status === "running" && (
+            <p role="status" className="pr-sunk text-sm">It's running. It shows in your activity once it finishes.</p>
           )}
           {outcome?.status === "waiting_for_approval" && (
             <p role="status" className="pr-sunk text-sm">
@@ -214,7 +217,7 @@ export function SuperpowerPicker({ approvalsHref = "/", missionsHref = "/mission
                         </span>
                         <span className="pr-row-side">
                           <StatusPill tone={c.kind === "mission" ? "blue" : "grey"}>{c.kind === "mission" ? "Mission" : "Action"}</StatusPill>
-                          <span className="pr-meta">{upTo(c.priceMicro)}</span>
+
                         </span>
                       </button>
                     </li>
@@ -229,7 +232,7 @@ export function SuperpowerPicker({ approvalsHref = "/", missionsHref = "/mission
           {picked ? (
             <ChoiceDetail key={`${picked.kind}:${picked.id}`} id={picked.id} kind={picked.kind} approvalsHref={approvalsHref} missionsHref={missionsHref} walletHref={walletHref} />
           ) : (
-            <EmptyState title="Choose one">Its price and the questions it needs show here.</EmptyState>
+            <EmptyState title="Choose one">The questions it needs show here.</EmptyState>
           )}
         </div>
       </div>

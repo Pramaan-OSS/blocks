@@ -52,11 +52,12 @@ export interface Estimate {
   readonly topUp?: TopUp;
 }
 
-export type RunResult = { readonly status: "done"; readonly result: unknown } | { readonly status: "waiting_for_approval" };
+export type RunResult = { readonly status: "done"; readonly result: unknown } | { readonly status: "waiting_for_approval" } | { readonly status: "running" };
 
 interface CapRow {
   id: string;
   description: string;
+  price_micro: number;
   price_estimate_micro?: number;
   available?: boolean;
   needs_connection?: boolean;
@@ -68,6 +69,8 @@ interface CapRow {
 interface MissionRow {
   id: string;
   description: string;
+  price_micro: number;
+  needs_connection?: boolean;
   price_max_micro?: number;
   available?: boolean;
   requires_approval?: boolean;
@@ -89,7 +92,7 @@ const fromCap = (r: CapRow): Choice => ({
   kind: "action",
   name: actionName(r.id),
   description: r.description,
-  priceMicro: r.price_estimate_micro ?? 0,
+  priceMicro: r.price_micro,
   needsApproval: r.requires_approval === true,
   needsConnection: r.needs_connection === true,
 });
@@ -99,9 +102,9 @@ const fromMission = (r: MissionRow): Choice => ({
   kind: "mission",
   name: actionName(r.id),
   description: r.description,
-  priceMicro: r.price_max_micro ?? 0,
+  priceMicro: r.price_micro,
   needsApproval: r.requires_approval === true,
-  needsConnection: false,
+  needsConnection: r.needs_connection === true,
 });
 
 /** Search in plain words. Nothing is offered that can't run now. */
@@ -110,10 +113,9 @@ export async function searchChoices(q: string | null): Promise<SearchResult> {
   if (query.length > 500) throw bad("Search for up to 500 characters.");
   const [caps, outcomes] = await Promise.all([
     pramaan<{ results: CapRow[]; clarify?: Clarify; near_misses?: { missed?: string[] }[] }>(`/v1/capabilities${query ? `?query=${encodeURIComponent(query)}` : ""}`),
-    pramaan<{ results: MissionRow[] }>("/v1/outcomes"),
+    pramaan<{ results: MissionRow[] }>(`/v1/outcomes${query ? `?query=${encodeURIComponent(query)}` : ""}`),
   ]);
-  const want = query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-  const missions = outcomes.results.filter((m) => m.available !== false && (want.length === 0 || want.some((w) => `${m.id.replace(/[._-]/g, " ")} ${m.description}`.toLowerCase().includes(w))));
+  const missions = outcomes.results.filter((m) => m.available !== false);
   const all = [...caps.results.filter((r) => r.available !== false && r.search_hidden !== true).map(fromCap), ...missions.map(fromMission)];
   return {
     results: all.slice(0, SHOWN),
@@ -139,14 +141,14 @@ export async function describeChoice(kind: string, id: string): Promise<Detail> 
 
 export async function estimateChoice(id: string, input: unknown): Promise<Estimate> {
   idOf(id);
-  const r = await pramaan<{ price_max_micro?: number; price_estimate_micro?: number; ready?: boolean; can_run?: boolean; message?: string; top_up?: TopUp }>(
+  const r = await pramaan<{ price_max_micro: number; can_run: boolean; message?: string; top_up?: TopUp }>(
     `/v1/capabilities/${encodeURIComponent(id)}/estimate`,
     { method: "POST", body: input ?? {} },
   );
   return {
-    priceMaxMicro: r.price_max_micro ?? r.price_estimate_micro ?? 0,
-    ready: r.ready !== false,
-    canRun: r.can_run !== false,
+    priceMaxMicro: r.price_max_micro,
+    ready: r.can_run,
+    canRun: r.can_run,
     ...(r.message ? { message: r.message } : {}),
     ...(r.top_up ? { topUp: r.top_up } : {}),
   };
@@ -159,6 +161,8 @@ export async function estimateChoice(id: string, input: unknown): Promise<Estima
  */
 export async function runChoice(id: string, input: unknown, key: string): Promise<RunResult> {
   idOf(id);
-  const res = await capability<{ status?: string; job_id?: string } & Record<string, unknown>>(id, input ?? {}, { "Idempotency-Key": key });
-  return res.status === "running" && typeof res.job_id === "string" ? { status: "waiting_for_approval" } : { status: "done", result: res };
+  const res = await capability<{ status?: string; job_id?: string; approval_id?: string } & Record<string, unknown>>(id, input ?? {}, { "Idempotency-Key": key });
+  if (res.status !== "running" || typeof res.job_id !== "string") return { status: "done", result: res };
+  // The documented 202: approval_id (an apr_ job) while a person must decide; otherwise an async job.
+  return res.approval_id || res.job_id.startsWith("apr_") ? { status: "waiting_for_approval" } : { status: "running" };
 }

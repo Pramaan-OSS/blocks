@@ -210,6 +210,7 @@
         { "path": "registry/pramaan-core/components/pramaan/fields.tsx", "type": "registry:component", "target": "components/pramaan/fields.tsx" },
         { "path": "registry/memory/lib/pramaan/memory.ts", "type": "registry:lib", "target": "lib/pramaan/memory.ts" },
         { "path": "registry/memory/components/pramaan/memory/memory-viewer.tsx", "type": "registry:component", "target": "components/pramaan/memory/memory-viewer.tsx" },
+        { "path": "registry/memory/app/api/pramaan/memory/profile/route.ts", "type": "registry:file", "target": "app/api/pramaan/memory/profile/route.ts" },
         { "path": "registry/memory/app/api/pramaan/memory/route.ts", "type": "registry:file", "target": "app/api/pramaan/memory/route.ts" },
         { "path": "registry/memory/app/api/pramaan/memory/[id]/route.ts", "type": "registry:file", "target": "app/api/pramaan/memory/[id]/route.ts" },
         { "path": "registry/memory/app/api/pramaan/memory/forget/route.ts", "type": "registry:file", "target": "app/api/pramaan/memory/forget/route.ts" },
@@ -313,6 +314,7 @@
         { "path": "registry/activity/components/pramaan/activity/activity-log.tsx", "type": "registry:component", "target": "components/pramaan/activity/activity-log.tsx" },
         { "path": "registry/activity/app/api/pramaan/activity/route.ts", "type": "registry:file", "target": "app/api/pramaan/activity/route.ts" },
         { "path": "registry/activity/app/api/pramaan/activity/[id]/route.ts", "type": "registry:file", "target": "app/api/pramaan/activity/[id]/route.ts" },
+        { "path": "registry/activity/app/api/pramaan/activity/deliveries/[id]/replay/route.ts", "type": "registry:file", "target": "app/api/pramaan/activity/deliveries/[id]/replay/route.ts" },
         { "path": "registry/activity/app/api/pramaan/activity/deliveries/route.ts", "type": "registry:file", "target": "app/api/pramaan/activity/deliveries/route.ts" }
       ]
     },

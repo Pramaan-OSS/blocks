@@ -263,7 +263,7 @@ function approvalJob(c: FakeCtx, id: string): Response {
   const failed = (message: string) => c.json(200, { ...base, status: "failed", error: { code: "forbidden", message, effect: "none" } });
   if (expired) return failed("No member approved this call in time, so nothing ran.");
   if (a.status === "denied") return failed("A member declined this call, so nothing ran and nothing was charged.");
-  if (a.status === "approved") return c.json(200, { ...base, status: "done", result: { status: "sent" } });
+  if (a.status === "approved") return c.json(200, { ...base, status: "done", result: a.result ?? { status: "sent" } });
   return c.json(200, { ...base, status: a.status === "cancelled" ? "cancelled" : "running" });
 }
 

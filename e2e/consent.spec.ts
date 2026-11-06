@@ -26,20 +26,17 @@ test("consent: check, add, let someone be messaged again, and unsubscribe from t
   await expect(page.getByRole("list", { name: "Opt-outs" }).getByRole("listitem")).toHaveCount(4);
 
   await page.getByRole("button", { name: /Remove \+14…77/ }).click();
-  await page.getByLabel("Whole phone number or email").fill("+14155550177");
   await page.getByRole("button", { name: "Let them be messaged again" }).click();
-  await expect(page.getByText(/can be messaged again/)).toBeVisible();
-  await expect(page.getByRole("list", { name: "Opt-outs" }).getByRole("listitem")).toHaveCount(3);
+  await expect(page.getByText(/Removal is waiting for approval/)).toBeVisible();
+  await expect(page.getByRole("list", { name: "Opt-outs" }).getByRole("listitem")).toHaveCount(4);
 
   // The public page: no sign-in.
   const visitor = await (await browser.newContext({ baseURL: BASE })).newPage();
-  await visitor.goto("/stop");
-  await visitor.getByLabel("Your phone number or email").fill("visitor@example.com");
-  await visitor.getByLabel("Stop").selectOption("email");
+  await visitor.goto(`/stop?link=${encodeURIComponent("http://pramaan.fake/unsubscribe/recipient_demo")}`);
   await visitor.getByRole("button", { name: "Unsubscribe" }).click();
-  await expect(visitor.getByRole("status")).toContainText("You won't hear from us on that email again.");
+  await expect(visitor.getByRole("status")).toContainText("You are unsubscribed from emails from this app.");
   await page.reload();
-  await expect(page.getByRole("list", { name: "Opt-outs" }).getByRole("listitem")).toHaveCount(4);
+  await expect(page.getByRole("list", { name: "Opt-outs" }).getByRole("listitem")).toHaveCount(5);
 
   await browser.close();
 });

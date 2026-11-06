@@ -1,6 +1,6 @@
 import "server-only";
 import { PramaanError } from "@pramaan/sdk";
-import { capability, currentViewer, signedOut, type Viewer } from "@/lib/pramaan/server";
+import { asViewer, capability, currentViewer, signedOut, transport, type Viewer } from "@/lib/pramaan/server";
 
 // Server half of the consent block, on the messaging.opt-out superpowers: list, check, add and
 // remove. Opt-outs are free and served by Pramaan itself. Every send through Pramaan is checked
@@ -12,6 +12,9 @@ export type Source = "builder_api" | "inbound_stop" | "unsubscribe_link";
 
 export interface Entry {
   readonly optOutId: string;
+  readonly createdBy?: string;
+  readonly removedBy?: string;
+  readonly removedAt?: string;
   /** The start and end of the address, enough to recognise it. The rest isn't kept. */
   readonly addressHint: string;
   readonly channel: Scope;
@@ -55,9 +58,12 @@ function channelOf(v: unknown, allowAll: boolean): string {
   throw bad(allowAll ? "Choose text messages, WhatsApp, calls, email or all." : "Choose text messages, WhatsApp, calls or email.");
 }
 
-export async function listOptOuts(request: Request, cursor: string | null): Promise<OptOutList> {
+export async function listOptOuts(request: Request, cursor: string | null, filters: { query?: string; channel?: string; source?: string; removed?: boolean } = {}): Promise<OptOutList> {
   const viewer = await signedIn(request);
-  const page = await capability<Omit<OptOutList, "viewer">>("messaging.opt-outs.list", { limit: 50, ...(cursor ? { cursor } : {}) });
+  if (filters.query && filters.query.length > 200) throw bad("Search for up to 200 characters.");
+  if (filters.channel) channelOf(filters.channel, true);
+  if (filters.source && !["builder_api", "inbound_stop", "unsubscribe_link"].includes(filters.source)) throw bad("Choose how the opt-out was added.");
+  const page = await capability<Omit<OptOutList, "viewer">>("messaging.opt-outs.list", { limit: 50, ...filters, ...(cursor ? { cursor } : {}) }, asViewer(viewer));
   return { ...page, viewer };
 }
 
@@ -68,36 +74,29 @@ export async function checkOptOut(request: Request, a: string | null, channel: s
 }
 
 export async function addOptOut(request: Request, body: { address?: unknown; channel?: unknown; reason?: unknown }) {
-  await signedIn(request);
-  const reason = typeof body.reason === "string" ? body.reason.trim().slice(0, 200) : "";
-  return capability<Entry>("messaging.opt-out.add", { address: address(body.address), channel: channelOf(body.channel ?? "all", true), ...(reason ? { reason } : {}) });
-}
-
-// Limit: removals are logged to the server console. The API has no audit field on remove;
-// send this line to your own audit log.
-const audit = (line: Record<string, unknown>) => console.info(JSON.stringify({ event: "opt_out_removed", ...line }));
-
-/**
- * Lets a person be messaged again. Only an approver may: it undoes someone's wish not to be
- * contacted. The API's remove call needs the whole address (the list shows only a hint) and takes
- * away only entries the project added; a person's own STOP or unsubscribe stays.
- */
-export async function removeOptOut(request: Request, body: { address?: unknown; channel?: unknown }) {
   const viewer = await signedIn(request);
-  if (!viewer.canApprove) throw new PramaanError("forbidden", "Only an approver can let someone be messaged again. Ask an approver in your workspace.", { status: 403 });
-  const a = address(body.address);
-  const channel = body.channel === undefined ? undefined : channelOf(body.channel, true);
-  const res = await capability<{ removed: number }>("messaging.opt-out.remove", { address: a, ...(channel ? { channel } : {}), confirm: true });
-  audit({ by: viewer.memberId, channel: channel ?? "every channel", removed: res.removed, at: new Date().toISOString() });
-  return res;
+  const reason = typeof body.reason === "string" ? body.reason.trim().slice(0, 200) : "";
+  return capability<Entry>("messaging.opt-out.add", { address: address(body.address), channel: channelOf(body.channel ?? "all", true), ...(reason ? { reason } : {}) }, asViewer(viewer));
 }
 
-/**
- * The public stop page: anyone can unsubscribe their own address. The answer never says whether it
- * was already listed, so the page can't be used to find out who is a contact. Add your own rate
- * limit in front of this route.
- */
-export async function unsubscribe(body: { address?: unknown; channel?: unknown }) {
-  await capability<Entry>("messaging.opt-out.add", { address: address(body.address), channel: channelOf(body.channel ?? "all", true), reason: "Unsubscribed on your website" });
+/** Removal is held for approval; the service keeps the actor and removal history. */
+export async function removeOptOut(request: Request, body: { optOutId?: unknown }) {
+  const viewer = await signedIn(request);
+  if (typeof body.optOutId !== "string" || !/^opt_[A-Za-z0-9_-]{1,128}$/.test(body.optOutId)) throw bad("Choose an entry from the list.");
+  const res = await capability<{ removed?: number; status?: string }>("messaging.opt-out.remove", { optOutId: body.optOutId, confirm: true }, asViewer(viewer));
+  return res.status === "running" ? { status: "waiting_for_approval" as const } : { status: "done" as const, removed: res.removed ?? 0 };
+}
+
+/** The signed recipient link names the address; browser-supplied addresses are never accepted. */
+export async function unsubscribe(body: { link?: unknown }) {
+  const t = transport();
+  let link: URL;
+  try { link = new URL(String(body.link)); } catch { throw bad("Use the unsubscribe link in your message."); }
+  if (link.origin !== new URL(t.baseUrl).origin || !/^\/unsubscribe\/[A-Za-z0-9._~-]+$/.test(link.pathname) || link.search || link.hash)
+    throw bad("Use the unsubscribe link in your message.");
+  // No key goes with it; a redirect is refused, which fetch reports by throwing.
+  const res = await t.fetch(link.href, { method: "POST", cache: "no-store", redirect: "error" }).catch(() => undefined);
+  if (res?.status === 429) throw new PramaanError("rate_limited", "Too many tries. Wait a minute and try again.", { status: 429 });
+  if (!res?.ok) throw bad("This link could not be used. Use the link in a more recent message.");
   return { ok: true as const };
 }

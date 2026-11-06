@@ -33,7 +33,7 @@ describe("SuperpowerPicker", () => {
     await waitFor(() => expect(within(screen.getByRole("list", { name: "Matches" })).getAllByRole("listitem")).toHaveLength(2));
     const list = screen.getByRole("list", { name: "Matches" });
     expect(list.textContent).toContain("Search the web");
-    expect(list.textContent).toContain("up to $0.01");
+    expect(list.textContent).not.toMatch(/\$/);
     expect(document.body.textContent).not.toMatch(/web\.search|sms\.send|email\.send/);
   });
 
@@ -42,8 +42,8 @@ describe("SuperpowerPicker", () => {
     await search(user, "web");
     await user.click(await screen.findByRole("button", { name: /Search the web/ }));
     await user.type(await screen.findByLabelText(/Search for/), "pramaan");
-    await user.click(screen.getByRole("button", { name: "Get the price" }));
-    await screen.findByLabelText("Price");
+    await user.click(screen.getByRole("button", { name: "Check before running" }));
+    await screen.findByLabelText("Readiness");
     await user.click(screen.getByRole("button", { name: "Run it" }));
     const dialog = await screen.findByRole("alertdialog");
     expect(within(dialog).getByLabelText("Exact inputs").textContent).toContain("pramaan");
@@ -62,8 +62,8 @@ describe("SuperpowerPicker", () => {
     await user.click(within(q).getByRole("button", { name: "Send a text message" }));
     await user.type(await screen.findByLabelText(/^To/), "+15555550123");
     await user.type(screen.getByLabelText(/Message|Text/), "Your table is ready.");
-    await user.click(screen.getByRole("button", { name: "Get the price" }));
-    await screen.findByLabelText("Price");
+    await user.click(screen.getByRole("button", { name: "Check before running" }));
+    await screen.findByLabelText("Readiness");
     await user.click(screen.getByRole("button", { name: "Ask for a yes" }));
     const dialog = await screen.findByRole("alertdialog");
     expect(dialog.textContent).toContain("goes to the approvals inbox first");
@@ -77,9 +77,9 @@ describe("SuperpowerPicker", () => {
     const user = await open();
     await search(user, "web");
     await user.click(await screen.findByRole("button", { name: /Search the web/ }));
-    await user.click(await screen.findByRole("button", { name: "Get the price" }));
+    await user.click(await screen.findByRole("button", { name: "Check before running" }));
     expect((await screen.findByRole("alert")).textContent).toContain("Search for is required.");
-    expect(screen.queryByLabelText("Price")).toBeNull();
+    expect(screen.queryByLabelText("Readiness")).toBeNull();
   });
 
   it("a mission shows its steps and leads to the missions screen", async () => {

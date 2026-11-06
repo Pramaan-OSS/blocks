@@ -10,6 +10,7 @@ import { currentEndUserRef } from "@/lib/pramaan/session";
 export type ConnectionStatus = "connected" | "needs_reconnect" | "pending" | "revoked";
 
 export interface Connection {
+  readonly logo_url?: string | null;
   readonly app: string;
   readonly status: ConnectionStatus;
   /** The API's own state: active, pending, failed, expired, disabled or revoked. */
@@ -37,6 +38,7 @@ export interface ConnectionList {
 }
 
 interface ListRow {
+  logo_url?: string | null;
   app: string;
   status: string;
   connectedAt?: string;
@@ -80,6 +82,7 @@ export async function listConnections(request: Request, app?: string): Promise<C
     const detail = detailed.results.find((d) => d.app === row.app);
     return {
       app: row.app,
+      logo_url: row.logo_url,
       state: row.status,
       status: statusOf(row.status),
       ...(row.connectedAt ? { connectedAt: row.connectedAt } : {}),

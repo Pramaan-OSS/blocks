@@ -95,7 +95,7 @@ async function adminViewer(request: Request) {
 export async function orgQueue(request: Request): Promise<OrgQueue> {
   const viewer = await adminViewer(request);
   if (!viewer) return { admin: false, rows: [], notices: [] };
-  const q = await pramaan<Omit<OrgQueue, "admin">>("/v1/internal/memory/admin/queue", { headers: asViewer(viewer) });
+  const q = await pramaan<Omit<OrgQueue, "admin">>("/v1/memory/admin/queue", { headers: asViewer(viewer) });
   return { admin: true, rows: q.rows, notices: q.notices };
 }
 
@@ -104,7 +104,14 @@ const ACTIONS = ["approve", "reject", "remove", "acknowledge"] as const;
 export async function decideOrg(request: Request, body: { id?: unknown; action?: unknown }) {
   const viewer = await adminViewer(request);
   if (!viewer) throw new PramaanError("forbidden", "Only workspace admins can manage organisation memory. Ask an admin to sign in.", { status: 403 });
-  if (typeof body.id !== "string" || !/^mi_[A-Za-z0-9_-]{1,200}$/.test(body.id)) throw bad("Choose a memory to decide.");
+  if (typeof body.id !== "string" || !/^[A-Za-z0-9_-]{1,200}$/.test(body.id)) throw bad("Choose a memory to decide.");
   if (!ACTIONS.includes(body.action as (typeof ACTIONS)[number])) throw bad("Choose approve, reject, remove or acknowledge.");
-  return pramaan<{ ok: true }>("/v1/internal/memory/admin/decide", { method: "POST", body: { id: body.id, action: body.action }, headers: asViewer(viewer) });
+  return pramaan<{ ok: true }>("/v1/memory/admin/decide", { method: "POST", body: { id: body.id, action: body.action }, headers: asViewer(viewer) });
+}
+
+/** Member facts use the workspace member identity, not the app's end-user reference. */
+export async function memberProfile(request: Request) {
+  const viewer = await currentViewer(request);
+  if (!viewer.memberId) throw signedOut("Sign in to see what is remembered about you.");
+  return capability<{ facts: { id: string; text: string }[] }>("memory.member.profile.get", { scope: { user: viewer.memberId } }, asViewer(viewer));
 }

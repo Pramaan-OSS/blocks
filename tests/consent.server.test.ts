@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { failNext, fakeState, resetFake } from "@/lib/pramaan/fake";
+import { failNext, fakePramaanFetch, fakeState, resetFake } from "@/lib/pramaan/fake";
 import { get, post } from "./harness";
 
 const C = "/api/pramaan/consent";
@@ -62,35 +62,50 @@ describe("consent routes", () => {
     expect(res).toMatchObject({ status: 400, body: { error: { message: "An email address can only be blocked on email or all." } } });
   });
 
-  it("only an approver lets someone be messaged again, and who did it is recorded", async () => {
+  it("requests removal by handle and preserves the opt-out until approval, with server history", async () => {
     const log = vi.spyOn(console, "info").mockImplementation(() => {});
-    const denied = await json(await post(viewer, `${C}/remove`, { address: "+14155550100", channel: "sms" }));
-    expect(denied).toMatchObject({ status: 403, body: { error: { message: expect.stringContaining("Only an approver") } } });
-    expect(calls("messaging.opt-out.remove")).toHaveLength(0);
-
-    const ok = await json(await post(owner, `${C}/remove`, { address: "+14155550100", channel: "sms" }));
-    expect(ok.body).toEqual({ removed: 1 });
-    expect(calls("messaging.opt-out.remove")[0].body).toMatchObject({ confirm: true });
-    const line = JSON.parse(log.mock.calls[0][0] as string);
-    expect(line).toMatchObject({ event: "opt_out_removed", by: "mbr_owner", channel: "sms", removed: 1 });
-    expect(JSON.stringify(line)).not.toContain("14155550100");
-    expect((await json(await get(owner, `${C}/check?address=%2B14155550100&channel=sms`))).body).toEqual({ blocked: false });
+    const row = (await (await get(owner, C)).json()).results[0];
+    const ok = await json(await post(owner, `${C}/remove`, { optOutId: row.optOutId }));
+    expect(ok.body).toEqual({ status: "waiting_for_approval" });
+    expect(calls("messaging.opt-out.remove")[0].body).toEqual({ optOutId: row.optOutId, confirm: true });
+    expect((await (await get(owner, C)).json()).results).toHaveLength(3);
+    expect(log).not.toHaveBeenCalled();
+    const approval = [...fakeState().approvals.values()].find((a) => a.capability === "messaging.opt-out.remove")!;
+    await post(owner, `/api/pramaan/approvals/${approval.id}/decide`, { decision: "approve" });
+    expect((await (await get(owner, C)).json()).results).toHaveLength(2);
+    const history = (await (await get(owner, `${C}?removed=true`)).json()).results;
+    const completed = await (await fakePramaanFetch(`http://pramaan.fake/v1/jobs/${approval.id}`, { headers: { Authorization: "Bearer fake" } })).json();
+    expect(completed.result).toEqual({ removed: 1 });
+    expect(history[0]).toMatchObject({ optOutId: row.optOutId, removedBy: owner, removedAt: expect.any(String) });
   });
 
-  it("can't lift a person's own unsubscribe, and a wrong address removes nothing", async () => {
-    vi.spyOn(console, "info").mockImplementation(() => {});
-    expect((await json(await post(owner, `${C}/remove`, { address: "pat@example.com", channel: "email" }))).body).toEqual({ removed: 0 });
-    expect((await json(await post(owner, `${C}/remove`, { address: "+14155550999", channel: "sms" }))).body).toEqual({ removed: 0 });
-    expect((await json(await get(owner, C))).body.results).toHaveLength(3);
+  it("keeps a recipient's unsubscribe even after a removal request is approved", async () => {
+    const rows = (await (await get(owner, C)).json()).results;
+    const ownChoice = rows.find((r: { source: string }) => r.source === "unsubscribe_link");
+    await post(owner, `${C}/remove`, { optOutId: ownChoice.optOutId });
+    const approval = [...fakeState().approvals.values()].find((a) => a.capability === "messaging.opt-out.remove")!;
+    await post(owner, `/api/pramaan/approvals/${approval.id}/decide`, { decision: "approve" });
+    const completed = await (await fakePramaanFetch(`http://pramaan.fake/v1/jobs/${approval.id}`, { headers: { Authorization: "Bearer fake" } })).json();
+    expect(completed.result).toEqual({ removed: 0 });
+    expect((await (await get(owner, C)).json()).results).toHaveLength(3);
   });
 
-  it("the public stop page needs no sign-in and gives the same answer whether or not the address was listed", async () => {
-    const fresh = await json(await post(undefined, `${C}/unsubscribe`, { address: "new@example.com", channel: "email" }));
-    const listed = await json(await post(undefined, `${C}/unsubscribe`, { address: "pat@example.com", channel: "email" }));
-    expect(fresh).toEqual({ status: 200, body: { ok: true } });
-    expect(listed).toEqual(fresh);
-    expect((await json(await get(owner, `${C}/check?address=new%40example.com&channel=email`))).body).toEqual({ blocked: true });
-    expect((await json(await post(undefined, `${C}/unsubscribe`, { address: "nope" }))).status).toBe(400);
+  it("filters on the service by hint, channel and source, and includes the actor", async () => {
+    const added = await (await post(owner, C, { address: "one@example.com", channel: "email" })).json();
+    expect(added.createdBy).toBe(owner);
+    const page = await (await get(owner, `${C}?query=one&channel=email&source=builder_api`)).json();
+    expect(page.results).toHaveLength(1);
+    expect(page.results[0].optOutId).toBe(added.optOutId);
+    expect((await post(owner, `${C}/remove`, { address: "one@example.com" })).status).toBe(400);
+  });
+
+  it("requires a signed recipient link and ignores substituted addresses", async () => {
+    expect((await post(undefined, `${C}/unsubscribe`, { address: "victim@example.com" })).status).toBe(400);
+    expect((await post(undefined, `${C}/unsubscribe`, { link: "https://elsewhere.example/unsubscribe/recipient_demo" })).status).toBe(400);
+    expect((await post(undefined, `${C}/unsubscribe`, { link: "http://pramaan.fake/unsubscribe/forged" })).status).toBe(400);
+    expect(await json(await post(undefined, `${C}/unsubscribe`, { link: "http://pramaan.fake/unsubscribe/recipient_demo", address: "victim@example.com" }))).toEqual({ status: 200, body: { ok: true } });
+    expect((await (await get(owner, `${C}/check?address=recipient%40example.com&channel=email`)).json()).blocked).toBe(true);
+    expect((await (await get(owner, `${C}/check?address=victim%40example.com&channel=email`)).json()).blocked).toBe(false);
   });
 
   it("pages the list with a cursor and passes the API's own error message through", async () => {

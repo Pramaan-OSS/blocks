@@ -58,8 +58,8 @@ Server only, from `app/api/pramaan/memory/`, with `PRAMAAN_API_KEY`:
 | `DELETE /api/pramaan/memory/{ref}` | `memory.item.delete` with `confirm: true` |
 | `POST /api/pramaan/memory/forget` | `memory.scope.delete` for the person, with `confirm: true` |
 | `GET /api/pramaan/memory/changes` | `memory.history.list` |
-| `GET /api/pramaan/memory/org` | `GET /v1/internal/memory/admin/queue` |
-| `POST /api/pramaan/memory/org/decide` | `POST /v1/internal/memory/admin/decide` |
+| `GET /api/pramaan/memory/org` | `GET /v1/memory/admin/queue` |
+| `POST /api/pramaan/memory/org/decide` | `POST /v1/memory/admin/decide` |
 
 Limits: the organisation routes open only to a signed-in admin session today, so that
 tab runs on the fake until Pramaan opens them to keys. "Forget everything" uses
@@ -75,3 +75,9 @@ Try it on the fake with `PRAMAAN_FAKE=1 pnpm dev` and open `/memory`.
 | `app/api/pramaan/memory/**` | route handlers |
 | `components/pramaan/memory/memory-viewer.tsx` | the screen |
 | `lib/pramaan/*`, `components/pramaan/*` | shared by every block |
+
+The “What it knows about me” summary uses `memory.member.profile.get` with the signed-in workspace
+member id, distinct from the app end-user reference used by the document memory list. Configure a
+member-bound key or session; a `Pramaan-Member` header alone cannot grant this access. The public
+organisation queue likewise requires a member-bound owner/admin key. Deletion still needs approval;
+202 is documented and remains waiting in the inbox.

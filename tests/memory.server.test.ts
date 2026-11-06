@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { addFakeMemory, failNext, fakeState, resetFake } from "@/lib/pramaan/fake";
+import { addFakeMemory, failNext, fakePramaanFetch, fakeState, resetFake } from "@/lib/pramaan/fake";
 import { asMember, callRoute, get, post } from "./harness";
 
 const M = "/api/pramaan/memory";
@@ -108,7 +108,23 @@ describe("memory routes", () => {
     expect(after.notices).toEqual([]);
     const wrong = await json(await post(owner, `${M}/org/decide`, { id: "mi_org_cand1", action: "reject" }));
     expect(wrong.body.error.message).toBe("Only candidates can be rejected. Use remove for org memory.");
-    expect((await json(await post(owner, `${M}/org/decide`, { id: "x", action: "approve" }))).status).toBe(400);
+    expect((await json(await post(owner, `${M}/org/decide`, { id: "x", action: "approve" }))).status).toBe(404);
+  });
+
+  it("reads the active member summary without accepting another user's scope", async () => {
+    const profile = await (await get(owner, `${M}/profile?user=user-7`)).json();
+    expect(profile.facts).toEqual([{ id: expect.any(String), text: "Prefers short, clear answers." }]);
+    const sent = fakeState().requests.find((r) => r.path.endsWith("memory.member.profile.get"))!;
+    expect(sent.body).toEqual({ scope: { user: owner } });
+    expect(sent.headers["pramaan-member"]).toBe(owner);
+    const read = (member: string, user: string) =>
+      fakePramaanFetch("http://pramaan.fake/v1/capabilities/memory.member.profile.get", { method: "POST", headers: { Authorization: "Bearer fake", "Pramaan-Member": member, "Content-Type": "application/json" }, body: JSON.stringify({ scope: { user } }) });
+    expect((await read(viewer, owner)).status).toBe(403);
+    expect((await read(owner, owner)).status).toBe(200);
+    expect((await get("none", `${M}/profile`)).status).toBe(401);
+    await get(owner, `${M}/org`);
+    expect(fakeState().requests.some((r) => r.path === "/v1/memory/admin/queue")).toBe(true);
+    expect(fakeState().requests.some((r) => r.path.startsWith("/v1/internal/memory"))).toBe(false);
   });
 
   it("passes the API's own error message through", async () => {

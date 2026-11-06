@@ -48,7 +48,7 @@ The parts are exported too: `ExamForm`, `QuestionForm`, `QuestionList`, `Publish
 | Exam list | Your exams, draft or published, with question count and length |
 | Exam builder | A draft form (title, length, pass score, proctoring, identity check), multiple-choice and written-answer questions, a preview as a candidate sees it, and Publish |
 | Invite | One or many emails; either email each their own link (from your connected Gmail or Outlook, or a domain you verified) or only create the links |
-| Candidate tracker | Link created, sent, started, finished, expired, revoked, with counts; Withdraw for unused ones; "Open the candidate's page" shows what the candidate sees (for links this browser created) |
+| Candidate tracker | Link created, sent, started, finished, expired, revoked, with counts; Withdraw for unused ones; "Open the candidate's page" shows what the candidate sees (using the returned invitation link, with browser memory only when the link is missing) |
 | Result | Score, pass or fail, grading progress, grade and note for each question |
 | Integrity | Verdict, score, how much of the test was monitored, evidence counts |
 

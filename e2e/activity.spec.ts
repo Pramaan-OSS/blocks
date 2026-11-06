@@ -24,5 +24,8 @@ test("activity: filter to failures, read what went wrong and the next step, chec
   await page.getByRole("tab", { name: "Webhook deliveries" }).click();
   await expect(page.getByRole("list", { name: "Webhook deliveries" })).toContainText("Job finished");
 
+  await page.getByRole("button", { name: "Replay", exact: true }).first().click();
+  await expect(page.getByText("Replay queued.")).toBeVisible();
+
   await browser.close();
 });

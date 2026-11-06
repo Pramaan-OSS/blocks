@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { completeFakeConnection, failNext, fakeState, resetFake } from "@/lib/pramaan/fake";
+import { platform } from "@/lib/pramaan/fake-platform";
 import { asMember, callRoute, get, post } from "./harness";
 
 const C = "/api/pramaan/connections";
@@ -11,6 +12,12 @@ const as = (user: string, url: string, init: RequestInit = {}) => callRoute(asMe
 const states = async () => Object.fromEntries((await json(await get(owner, C))).body.connections.map((c: { app: string; status: string }) => [c.app, c.status]));
 
 describe("connections routes", () => {
+  it("preserves the optional live app logo", async () => {
+    await get(owner, C);
+    platform(fakeState()).connections.get("user-42")![0].logo_url = "https://example.com/logo.svg";
+    expect((await (await get(owner, C)).json()).connections[0].logo_url).toBe("https://example.com/logo.svg");
+  });
+
   it("lists the person's apps with plain statuses, and the workspace accounts", async () => {
     const { status, body } = await json(await get(owner, C));
     expect(status).toBe(200);

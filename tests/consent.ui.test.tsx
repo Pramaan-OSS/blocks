@@ -3,8 +3,7 @@ import { cleanup, render, screen, waitFor, within } from "@testing-library/react
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ConsentBadge, ConsentManager, UnsubscribePage } from "@/components/pramaan/consent/consent-manager";
-import { fakeState, resetFake } from "@/lib/pramaan/fake";
-import { consent } from "@/lib/pramaan/fake-consent";
+import { resetFake } from "@/lib/pramaan/fake";
 import { appFetch } from "./harness";
 
 beforeEach(() => {
@@ -42,11 +41,11 @@ describe("ConsentManager", () => {
 
   it("searches the list", async () => {
     const user = await open();
-    await user.type(screen.getByLabelText("Search the list"), "email");
-    expect(within(screen.getByRole("list", { name: "Opt-outs" })).getAllByRole("listitem")).toHaveLength(1);
+    await user.type(screen.getByLabelText("Search the list"), "pat");
+    await waitFor(() => expect(within(screen.getByRole("list", { name: "Opt-outs" })).getAllByRole("listitem")).toHaveLength(1));
     await user.clear(screen.getByLabelText("Search the list"));
     await user.type(screen.getByLabelText("Search the list"), "zzz");
-    expect(screen.getByText("Nothing matches")).toBeTruthy();
+    expect(await screen.findByText("Nothing matches")).toBeTruthy();
   });
 
   it("checks a contact and says in words whether a message would go through", async () => {
@@ -71,33 +70,23 @@ describe("ConsentManager", () => {
     expect(screen.getByText("Asked by letter", { exact: false })).toBeTruthy();
   });
 
-  it("an approver removes an entry by typing the whole address; a wrong one removes nothing; a person's own stays", async () => {
+  it("requests approval by row handle without asking for the full address", async () => {
     const user = await open();
     const rows = within(screen.getByRole("list", { name: "Opt-outs" })).getAllByRole("listitem");
-    // The person's own unsubscribe has no Remove.
     expect(within(rows[1]).queryByRole("button", { name: /Remove/ })).toBeNull();
-    await user.click(within(rows[0]).getByRole("button", { name: /Remove \+14…00/ }));
+    await user.click(within(rows[0]).getByRole("button", { name: /Remove/ }));
     const form = screen.getByRole("form", { name: /be messaged again/ });
-    expect(form.textContent).toContain("Your workspace keeps a record of who did it");
-    await user.type(within(form).getByLabelText("Whole phone number or email"), "+14155550999");
+    expect(within(form).queryByRole("textbox")).toBeNull();
     await user.click(within(form).getByRole("button", { name: "Let them be messaged again" }));
-    expect((await within(form).findByRole("alert")).textContent).toContain("doesn't match this entry");
-    await user.clear(within(form).getByLabelText("Whole phone number or email"));
-    await user.type(within(form).getByLabelText("Whole phone number or email"), "+14155550100");
-    await user.click(within(form).getByRole("button", { name: "Let them be messaged again" }));
-    expect(await screen.findByText(/can be messaged again on text messages/)).toBeTruthy();
-    await waitFor(() => expect(within(screen.getByRole("list", { name: "Opt-outs" })).getAllByRole("listitem")).toHaveLength(2));
-    expect(consent(fakeState()).entries.some((e) => e.address === "+14155550100")).toBe(false);
+    expect(await screen.findByText(/Removal is waiting for approval/)).toBeTruthy();
+    expect(within(screen.getByRole("list", { name: "Opt-outs" })).getAllByRole("listitem")).toHaveLength(3);
   });
 
-  it("a member who can't approve sees the list but no Remove, and is told why", async () => {
+  it("lets signed-in members request a removal that still needs approval", async () => {
     await open("mbr_viewer");
-    expect(screen.queryAllByRole("button", { name: /Remove/ })).toHaveLength(0);
-    expect(screen.getByText(/Only an approver can let someone be messaged again/)).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /Remove/ })).toHaveLength(2);
   });
-});
 
-describe("ConsentBadge and UnsubscribePage", () => {
   it("the badge says OK to message or opted out", async () => {
     vi.stubGlobal("fetch", appFetch("mbr_owner"));
     render(<><ConsentBadge address="+14155550100" channel="sms" /><ConsentBadge address="+14155550100" channel="voice" /></>);
@@ -105,23 +94,19 @@ describe("ConsentBadge and UnsubscribePage", () => {
     expect(await screen.findByText("OK to message")).toBeTruthy();
   });
 
-  it("the public stop page unsubscribes without signing in and says done the same way for any address", async () => {
+  it("unsubscribes the signed recipient without asking for their address", async () => {
     vi.stubGlobal("fetch", appFetch());
     const user = userEvent.setup();
-    render(<UnsubscribePage />);
-    await user.type(screen.getByLabelText("Your phone number or email"), "pat@example.com");
-    await user.selectOptions(screen.getByLabelText("Stop"), "email");
+    render(<UnsubscribePage link="http://pramaan.fake/unsubscribe/recipient_demo" />);
+    expect(screen.queryByRole("textbox")).toBeNull();
     await user.click(screen.getByRole("button", { name: "Unsubscribe" }));
-    expect((await screen.findByRole("status")).textContent).toContain("You won't hear from us on that email again.");
-    expect(document.body.textContent).not.toMatch(/already|opt_/);
+    expect((await screen.findByRole("status")).textContent).toContain("You are unsubscribed");
   });
 
-  it("the stop page shows the API's message for an address it can't read", async () => {
-    vi.stubGlobal("fetch", appFetch());
-    const user = userEvent.setup();
+  it("explains that a signed link is required when opened without one", async () => {
     render(<UnsubscribePage />);
-    await user.type(screen.getByLabelText("Your phone number or email"), "hello");
-    await user.click(screen.getByRole("button", { name: "Unsubscribe" }));
-    expect((await screen.findByRole("alert")).textContent).toContain("address must be a phone number with its country code");
+    expect(screen.getByText(/Open the unsubscribe link in your message/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Unsubscribe" })).toBeNull();
   });
+
 });
