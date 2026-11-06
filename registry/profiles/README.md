@@ -5,9 +5,10 @@ links and a photo. Every field starts private. The public API constructs an allo
 explicitly public fields; it never sends a private field or stored file reference.
 
 Install `public/r/profiles.json` with `npx shadcn@4.23.0 add <path-or-url>`.
-The block includes its moderation server helpers and both numbered migrations:
-`src/db/migrations/crm_profiles_001.sql` and `src/db/migrations/crm_moderation_001.sql`.
-Apply both to the host's Postgres database before serving, and set `DATABASE_URL`. Each
+The block includes its moderation server helpers and three numbered migrations in
+`db/migrations/`, or `src/db/migrations/` if the app has a `src` folder:
+`crm_profiles_001.sql`, `crm_moderation_001.sql` and `crm_moderation_002.sql`.
+Apply all three to the host's Postgres database before serving, and set `DATABASE_URL`. Each
 profile is one `crm_profile` row with parameterized queries and a matching in-memory fake.
 A revision prevents a stale edit overwriting a newer save. No database or auth service is provisioned.
 

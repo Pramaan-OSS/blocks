@@ -120,11 +120,20 @@
       "@/lib/pramaan/password-reset-sender": ["./registry/password-reset/lib/pramaan/password-reset-sender.ts"],
       "@/lib/pramaan/password-reset-runtime": ["./registry/password-reset/lib/pramaan/password-reset-runtime.ts"],
       "@/components/pramaan/password-reset/*": ["./registry/password-reset/components/pramaan/password-reset/*"],
+      "@/lib/pramaan/listings": ["./registry/listings/lib/pramaan/listings.ts"],
+      "@/components/pramaan/listings/*": ["./registry/listings/components/pramaan/listings/*"],
+      "@/lib/pramaan/applications": ["./registry/applications/lib/pramaan/applications.ts"],
+      "@/lib/pramaan/application-notice": ["./registry/applications/lib/pramaan/application-notice.ts"],
+      "@/components/pramaan/applications/*": ["./registry/applications/components/pramaan/applications/*"],
       "@/lib/pramaan/profiles": ["./registry/profiles/lib/pramaan/profiles.ts"],
       "@/lib/pramaan/moderation": ["./registry/moderation/lib/pramaan/moderation.ts"],
       "@/lib/pramaan/social-context": ["./registry/moderation/lib/pramaan/social-context.ts"],
       "@/components/pramaan/profiles/*": ["./registry/profiles/components/pramaan/profiles/*"],
       "@/components/pramaan/moderation/*": ["./registry/moderation/components/pramaan/moderation/*"],
+      "@/lib/pramaan/feed": ["./registry/feed/lib/pramaan/feed.ts"],
+      "@/lib/pramaan/messaging": ["./registry/messaging/lib/pramaan/messaging.ts"],
+      "@/components/pramaan/feed/*": ["./registry/feed/components/pramaan/feed/*"],
+      "@/components/pramaan/messaging/*": ["./registry/messaging/components/pramaan/messaging/*"],
       "@/*": [
         "./*"
       ]

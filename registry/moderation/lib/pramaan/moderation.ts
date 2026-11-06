@@ -1,12 +1,14 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
+import type postgres from "postgres";
 import { crmDatabase, fakeRows, text, CrmProblem } from "@/lib/pramaan/crm-data";
 import { capability } from "@/lib/pramaan/server";
 import { mayModerate, moderationSubject, socialScope } from "@/lib/pramaan/social-context";
 export type Target = { kind: "item" | "person"; ref: string };
-export type Report = Target & { id: string; reason: string; by: string; at: string; status: "open" | "hidden" | "dismissed"; automatic: boolean; decidedBy?: string; decidedAt?: string };
+export type Subject = { label: string; href?: string; excerpt?: string };
+export type Report = Target & { id: string; reason: string; by: string; at: string; status: "open" | "hidden" | "dismissed"; automatic: boolean; decidedBy?: string; decidedAt?: string; subject?: Subject };
 /** What reviewers receive: plain labels, without member or content references. */
-export type QueueReport = Pick<Report, "id" | "kind" | "reason" | "at" | "status" | "automatic" | "decidedAt"> & { reviewer?: "you" | "another moderator"; subject?: { label: string; href?: string; excerpt?: string } };
+export type QueueReport = Pick<Report, "id" | "kind" | "reason" | "at" | "status" | "automatic" | "decidedAt"> & { reviewer?: "you" | "another moderator"; subject?: Subject };
 export type ModerationData = { reports: QueueReport[] };
 export type AuditEntry = { action: "hide" | "dismiss"; by: string; at: string; target: Target };
 type Scoped<T> = T & { scope: string };
@@ -28,18 +30,36 @@ export async function isHidden(ref: string, scope = socialScope()) {
   if (isFake()) return fakeRows<Scoped<{ ref: string }>>("crm_hidden_item").some(h => h.scope === scope && h.ref === ref);
   return (await crmDatabase()`select 1 from crm_hidden_item where scope = ${scope} and ref = ${ref}`).length > 0;
 }
-export async function reportTarget(scope: string, by: string, target: Target, reason: string, automatic = false) {
+/** A block in either direction: the blocker stops seeing the person, and a blocked person sees nothing of the blocker. */
+export async function blockedEitherWay(viewer: string | undefined, other: string, scope = socialScope()) {
+  return !!viewer && (await isBlocked(viewer, other, scope) || await isBlocked(other, viewer, scope));
+}
+/** Whether the viewer may see this person's item. Use it for one item; use `visibleSql` for a list. */
+export async function canSee(scope: string, viewer: string, author: string, ref: string) {
+  return !await isHidden(ref, scope) && !await blockedEitherWay(viewer, author, scope);
+}
+/** `blockedEitherWay` inside a list query, so a page of results stays full and cursors stay correct. */
+export function notBlockedSql(scope: string, viewer: string, author: postgres.Fragment) {
+  return crmDatabase()`not exists (select 1 from crm_block b where b.scope = ${scope} and ((b.viewer = ${viewer} and b.other = ${author}) or (b.viewer = ${author} and b.other = ${viewer})))`;
+}
+/** `canSee` inside a list query. */
+export function visibleSql(scope: string, viewer: string, author: postgres.Fragment, ref: postgres.Fragment) {
+  return crmDatabase()`not exists (select 1 from crm_hidden_item h where h.scope = ${scope} and h.ref = ${ref}) and ${notBlockedSql(scope, viewer, author)}`;
+}
+export async function reportTarget(scope: string, by: string, target: Target, reason: string, automatic = false, subject?: Subject) {
   const why = text(reason, "a reason", 1000);
   if (isFake()) {
     const reports = fakeRows<Scoped<Report>>("crm_report");
-    if (reports.some(r => r.scope === scope && r.by === by && r.kind === target.kind && r.ref === target.ref && r.status === "open")) return;
-    reports.push({ scope, ...target, id: randomUUID(), by, reason: why, at: new Date().toISOString(), status: "open", automatic });
+    const open = reports.find(r => r.scope === scope && r.by === by && r.kind === target.kind && r.ref === target.ref && r.status === "open");
+    if (open) { open.subject = subject ?? open.subject; return; }
+    reports.push({ scope, ...target, id: randomUUID(), by, reason: why, at: new Date().toISOString(), status: "open", automatic, subject });
     return;
   }
   // The partial unique index keeps one open report per reporter and target, even under races.
-  await crmDatabase()`insert into crm_report (id, scope, kind, ref, reason, reported_by, automatic)
-    values (${randomUUID()}, ${scope}, ${target.kind}, ${target.ref}, ${why}, ${by}, ${automatic})
-    on conflict (scope, reported_by, kind, ref) where status = 'open' do nothing`;
+  // A repeat keeps that report and shows its reviewer the newest words, as when the check runs on an edit.
+  await crmDatabase()`insert into crm_report (id, scope, kind, ref, reason, reported_by, automatic, subject)
+    values (${randomUUID()}, ${scope}, ${target.kind}, ${target.ref}, ${why}, ${by}, ${automatic}, ${subject ? JSON.stringify(subject) : null}::text::jsonb)
+    on conflict (scope, reported_by, kind, ref) where status = 'open' do update set subject = coalesce(excluded.subject, crm_report.subject)`;
 }
 function refuseDecision(report: { kind: string; status: string } | undefined, action: "hide" | "dismiss") {
   if (!report) throw new CrmProblem("This report is no longer available.", 404);
@@ -74,7 +94,10 @@ async function decide(scope: string, member: string, id: string, action: "hide" 
 }
 export async function moderate(scope: string, member: string, body: Record<string, unknown>) {
   if (body.action === "report") {
-    await reportTarget(scope, member, targetOf(body), text(body.reason, "a reason", 1000));
+    const target = targetOf(body);
+    // Looked up here, never taken from the browser, and kept so a later edit doesn't change what reviewers read.
+    const subject = await moderationSubject(target.kind, target.ref, scope);
+    await reportTarget(scope, member, target, text(body.reason, "a reason", 1000), false, subject.excerpt ? subject : undefined);
     return { message: "Report sent." };
   }
   if (body.action === "block" || body.action === "unblock") {
@@ -99,7 +122,7 @@ export async function moderate(scope: string, member: string, body: Record<strin
   return { message: "Review saved." };
 }
 /** Off by default. Classification is advisory: it never hides or deletes content. */
-export async function checkNewText(scope: string, target: Target, content: string) {
+export async function checkNewText(scope: string, target: Target, content: string, subject?: Subject) {
   if (process.env.PRAMAAN_TEXT_SCREENING !== "1" || !content.trim()) return;
   let reason = "Automatic text check needs a review.";
   try {
@@ -110,7 +133,7 @@ export async function checkNewText(scope: string, target: Target, content: strin
     if (safe) return;
     if (flagged) reason = "Automatic text check flagged this for review.";
   } catch { /* A failed check stays visible and goes to a person for review. */ }
-  await reportTarget(scope, "automatic", target, reason, true);
+  await reportTarget(scope, "automatic", target, reason, true, subject);
 }
 
 async function recentReports(scope: string): Promise<Report[]> {
@@ -120,7 +143,7 @@ async function recentReports(scope: string): Promise<Report[]> {
   }
   // ponytail: one bounded page of 200; add cursor paging when a community keeps more open reports than that.
   const rows = await crmDatabase()`select * from crm_report where scope = ${scope} order by (status = 'open') desc, reported_at desc limit ${QUEUE_LIMIT}`;
-  return rows.map(r => ({ id: r.id, kind: r.kind, ref: r.ref, reason: r.reason, by: r.reported_by, at: iso(r.reported_at)!, status: r.status, automatic: r.automatic, decidedBy: r.decided_by ?? undefined, decidedAt: iso(r.decided_at) }));
+  return rows.map(r => ({ id: r.id, kind: r.kind, ref: r.ref, reason: r.reason, by: r.reported_by, at: iso(r.reported_at)!, status: r.status, automatic: r.automatic, decidedBy: r.decided_by ?? undefined, decidedAt: iso(r.decided_at), subject: r.subject ?? undefined }));
 }
 /** Only call after verifying the viewer's moderator role. */
 export async function moderationQueue(scope: string, viewer?: string): Promise<ModerationData> {
@@ -128,7 +151,7 @@ export async function moderationQueue(scope: string, viewer?: string): Promise<M
   return { reports: await Promise.all(reports.map(async r => ({
     id: r.id, kind: r.kind, reason: r.reason, at: r.at, status: r.status, automatic: r.automatic,
     ...(r.decidedAt ? { decidedAt: r.decidedAt, reviewer: r.decidedBy === viewer ? "you" as const : "another moderator" as const } : {}),
-    subject: await moderationSubject(r.kind, r.ref, scope),
+    subject: r.subject ?? await moderationSubject(r.kind, r.ref, scope),
   }))) };
 }
 /** Who decided what and when, newest first. Only call after verifying the viewer's moderator role. */

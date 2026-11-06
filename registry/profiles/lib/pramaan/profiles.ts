@@ -82,7 +82,7 @@ export async function saveProfile(scope: string, person: string, body: Record<st
   if (!row) throw stale();
   return fromRow(row);
 }
-const PHOTO_TYPES = ["image/png", "image/jpeg", "image/webp"];
+export const PHOTO_TYPES = ["image/png", "image/jpeg", "image/webp"];
 export async function startProfilePhoto(scope: string, person: string, body: Record<string, unknown>) {
   if (!PHOTO_TYPES.includes(String(body.contentType)) || typeof body.sizeBytes !== "number" || body.sizeBytes > 5_000_000) throw new CrmProblem("Choose a PNG, JPEG or WebP photo under 5 MB.");
   const link = await startUpload(body);

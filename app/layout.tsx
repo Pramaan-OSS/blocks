@@ -20,6 +20,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </a>
             <a href="/profiles" className={link}>Profiles</a>
             <a href="/moderation" className={link}>Community safety</a>
+            <a href="/listings" className={link}>Listings</a>
+            <a href="/applications" className={link}>Applications</a>
+            <a href="/feed" className={link}>Feed</a>
+            <a href="/messages" className={link}>Messages</a>
             <a href="/contacts" className={link}>Contacts</a>
             <a href="/pipeline" className={link}>Pipeline</a>
             <a href="/missions" className={link}>

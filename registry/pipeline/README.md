@@ -17,7 +17,9 @@ Set `DATABASE_URL` on the server to your app's Postgres connection string. Do no
 Apply the numbered migration once before starting the app:
 
 ```sh
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f src/db/migrations/crm_pipeline_001.sql
+# In src/db/migrations if the app has a src folder, otherwise db/migrations.
+dir=db/migrations; [ -d src/db/migrations ] && dir=src/db/migrations
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$dir/crm_pipeline_001.sql"
 ```
 
 Migrations do not run on page loads. Use your deployment's migration tracking; the create-table statements can safely run again. No database is provisioned by the block. Both blocks may be installed together: their migrations and tables have distinct names.

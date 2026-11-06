@@ -130,4 +130,15 @@ Profiles and community safety: [profiles](registry/profiles/README.md) adds a pu
 private-by-default fields and photo uploads; [moderation](registry/moderation/README.md)
 adds reporting, blocking and an owner/admin review queue. Demo pages: `/profiles` and
 `/moderation`. Both use app-owned Postgres with numbered migrations and the shared fake.
+
+Listings and applications: [listings](registry/listings/README.md) adds posting, public search with
+filters and paging, and moderation; [applications](registry/applications/README.md) adds applying,
+status moves with a record of each change, and messages. Demo pages: `/listings` and `/applications`.
+Both use app-owned Postgres with numbered migrations and the shared fake.
+
+Feed and messaging: [feed](registry/feed/README.md) adds posts with photos, likes, comments and
+follows, a paged home feed and a person's posts on their profile page;
+[messaging](registry/messaging/README.md) adds one-to-one conversations with unread counts and read
+state, updated by polling. Demo pages: `/feed` and `/messages`. Both use app-owned Postgres and go
+through moderation for reports and blocks.
 Optional text screening is off by default; image screening is recorded in gap 76.

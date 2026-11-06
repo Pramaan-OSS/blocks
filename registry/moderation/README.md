@@ -6,7 +6,8 @@ Load the theme's Geist, Fraunces and JetBrains Mono fonts through `pramaanFonts`
 ## Install and connect
 
 Install `public/r/moderation.json` with `npx shadcn@4.23.0 add <path-or-url>`.
-Apply `src/db/migrations/crm_moderation_001.sql` to the app's Postgres database and set
+Apply `crm_moderation_001.sql`, then `crm_moderation_002.sql`, from `db/migrations/`, or
+`src/db/migrations/` if the app has a `src` folder, to the app's Postgres database and set
 `DATABASE_URL`. No database is provisioned by this block.
 
 Set `PRAMAAN_SOCIAL_SCOPE` to the community/workspace reference, and wire `socialContext`
@@ -30,7 +31,14 @@ block cannot intercept arbitrary host queries; apply these helpers to feeds, sea
 listings, comments and messages in the consuming kit. Internal references stay in data,
 never visible screen text. Wire `moderationSubject` to a scope-checked local content lookup for a plain label and
 excerpt of each reported item. Person reports link to the public profile. The demo supplies
-a sample post excerpt. The queue defaults to numbered reports when no lookup is connected.
+a sample post excerpt. The queue defaults to numbered reports when no lookup is connected. A block can instead pass a
+`subject` to `reportTarget` or `checkNewText`; it is stored on the report and shown first, as the
+feed and messaging blocks do. A report sent through this route stores what `moderationSubject`
+finds at that moment when it has an excerpt, which is how a listing's title and description reach
+the queue, so a later edit doesn't change what reviewers read. A repeat by the same reporter while
+the report is open keeps one report, and its excerpt follows the newest one. For several items,
+`blockedEitherWay`, `canSee` and `visibleSql` apply the same rules, `visibleSql` inside one list
+query so paging stays correct.
 For a single configured community, `isBlocked(viewer, other)` and `isHidden(itemRef)`
 also work without an explicit scope.
 
