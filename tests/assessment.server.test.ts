@@ -39,7 +39,8 @@ describe("assessment routes", () => {
     expect(invited[0].link).toMatch(/^https:\/\//);
 
     const rows = (await json(await get(owner, `${A}/exams/${ref}/invitations`))).body.results;
-    expect(rows[0].link).toBe(invited[0].link);
+    // Both invitations can share a millisecond or not, so match by ref, not list position.
+    expect(rows.find((r: { ref: string }) => r.ref === invited[0].ref).link).toBe(invited[0].link);
     expect((await (await get(owner, `${A}/invitations/${invited[0].ref}`)).json()).link).toBe(invited[0].link);
     expect(rows.filter((r: { ref: string }) => invited.some((i: { ref: string }) => i.ref === r.ref))).toHaveLength(2);
 
